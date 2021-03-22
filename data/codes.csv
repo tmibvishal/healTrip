@@ -67,7 +67,7 @@ Charlotte,NC,USA,CLT
 Charlottesville,VA,USA,CHO
 Chattanooga,TN,USA,CHA
 Cheyenne,WY,USA,CYS
-Chicago,IL,USA,CHI - All 
+Chicago,IL,USA,CHI 
 Chicago,IL,USA,MDW
 Chicago,IL,USA,ORD
 Chico,CA,USA,CIC
@@ -94,7 +94,7 @@ Daytona Beach,FL,USA,DAB
 Decatur,IL,USA,DEC
 Denver,CO,USA,DEN
 Des Moines,IA,USA,DSM
-Detroit,MI,USA,DTT - All 
+Detroit,MI,USA,DTT 
 Detroit,MI,USA,DTW
 Devils Lake,ND,USA,DVL
 Dickinson,ND,USA,DIK
@@ -105,7 +105,7 @@ Du Bois,PA,USA,DUJ
 Dubuque,IA,USA,DBQ
 Duluth,MN,USA,DLH
 Durango,CO,USA,DRO
-Dutch Harbor,Un Island,AK,USA,DUT
+Dutch Harbor,AK,USA,DUT
 Eau Claire,WI,USA,EAU
 Eek,AK,USA,EEK
 El Centro,CA,USA,IPL
@@ -155,7 +155,7 @@ Greenville,SC,USA,GSP
 Gulfport,MS,USA,GPT
 Gunnison,CO,USA,GUC
 Hagerstown,MD,USA,HGR
-Hana,Maui,HI,USA,HNM
+Hana Maui,HI,USA,HNM
 Hancock,MI,USA,CMX
 Harlingen,TX,USA,HRL
 Harrisburg,PA,USA,MDT
@@ -169,8 +169,8 @@ Hilo,Hawaii,USA,Big
 Hilton Head Island,SC,USA,HHH
 Hobbs,NM,USA,HOB
 Homer,AK,USA,HOM
-Honolulu,Oahu,HI,USA,HNL
-Hoolehua,Molokai,HI,USA,MKK
+Honolulu,HI,USA,HNL
+Hoolehua,HI,USA,MKK
 Hot Springs,AR,USA,HOT
 Houston,TX,USA,EFD
 Houston,TX,USA,HOU
@@ -198,14 +198,14 @@ Johnstown,PA,USA,JST
 Jonesboro,AR,USA,JBR
 Joplin,MO,USA,JLN
 Juneau,AK,USA,JNU
-Kahului,Maui,HI,USA,OGG
+Kahului,HI,USA,OGG
 Kailua-Kona,HI,USA,KOA
 Kalamazoo,MI,USA,AZO
-Kalaupapa,Molokai,HI,USA,LUP
+Kalaupapa,HI,USA,LUP
 Kalispell,MT,USA,FCA
 Kamuela,Hawaii,USA,KOA
 Kansas City,MO,USA,MCI
-Kapalua,Maui,HI,USA,JHM
+Kapalua,HI,USA,JHM
 Kearney,NE,USA,EAR
 Kenai,AK,USA,ENA
 Ketchikan,AK,USA,KTN
@@ -221,7 +221,7 @@ La Crosse,WI,USA,LSE
 Lafayette,LA,USA,LFT
 Lake Charles,LA,USA,LCH
 Lake Havasu City,AZ,USA,HII
-Lanai City,Lanai,HI,USA,LNY
+Lanai City,HI,USA,LNY
 Lancaster,PA,USA,LNS
 Lansing,MI,USA,LAN
 Laramie,WY,USA,LAR
@@ -237,16 +237,15 @@ Lewiston,ME,USA,LEW
 Lewistown,MT,USA,LWT
 Lexington,KY,USA,LEX
 Liberal,KS,USA,LBL
-Lihue,Kauai,HI,USA,LIH
+Lihue Kauai,HI,USA,LIH
 Lincoln,NE,USA,LNK
 Little Rock,AR,USA,LIT
 Long Beach,CA,USA,LGB
 Longview,TX,USA,GGG
 Los Angeles,CA,USA,LAX
 Los Angeles,CA,USA,QLA-All
-Louisville,KY,USA,USA,SDF
+Louisville,USA,USA,SDF
 Lubbock,TX,USA,LBB
-Lusaka,Zambia,LUN
 Lynchburg,VA,USA,LYH
 Macon,GA,USA,MCN
 Madison,WI,USA,MSN
@@ -423,9 +422,9 @@ Victoria,TX,USA,VCT
 Visalia,CA,USA,VIS
 Waco,TX,USA,ACT
 Walla Walla,WA,USA,ALW
-Washington DC,USA,DCA
-Washington DC,USA,IAD
-Washington DC,USA,WAS - All Airports 
+Washington DC,WA,USA,DCA
+Washington DC,WA,USA,IAD
+Washington DC,WA,USA,WAS 
 Waterloo,IA,USA,ALO
 Watertown,NY,USA,ART
 Watertown,SD,USA,ATY
