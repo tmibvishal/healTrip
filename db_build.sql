@@ -16,25 +16,37 @@ create table flights(
 );
 
 create table hotels(
-    id text ,
-    address text ,
-    city text ,
-    name text ,
-    postalCode text ,
-    province text ,
-    rating real
+    hotel_id integer,
+    city text,
+    province text,
+    name text,
+    address text,
+    postalcode text,
+    constraint hotel_key primary key (hotel_id)
+);
+
+create table reviews(
+    review_id integer,
+    hotel_id integer,
+    review_date date,
+    review_rating real,
+    review_username text,
+    review_title text,
+    review_text text,
+    constraint review_key primary key (review_id),
+    constraint hotel_ref foreign key (hotel_id) references hotels(hotel_id)
 );
 
 create table cities(
     city text ,
     city_ascii text ,
     state_id text ,
-    state_name text ,
-    id text
+    state_name text
 );
 
 \copy flights from 'data/flights.csv' delimiter ',' csv header;
 \copy airport_codes from 'data/codes.csv' delimiter ',' csv header;
-\copy hotels from 'data/new_hotels.csv' delimiter ',' csv header;
-\copy cities from 'data/new_us_cities.csv' delimiter ',' csv header;
+\copy hotels from 'data/hotels.csv' delimiter ',' csv header;
+\copy reviews from 'data/reviews.csv' delimiter ',' csv header;
+\copy cities from 'data/us_cities.csv' delimiter ',' csv header;
 
