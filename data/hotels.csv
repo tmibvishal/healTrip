@@ -924,7 +924,7 @@ hotel_id,city,province,name,address,postalcode
 923,Lake Charles,LA,Wingate by Wyndham Lake Charles Casino Area,1731 W Prien Lake Rd,70601
 924,Lake Elsinore,CA,Best Western Plus Lake Elsinore Inn & Suites,31781 Casino Dr,92530
 925,Lake Elsinore,CA,Quality Inn,31808 Casino Dr,92530
-926,Lake Forest,CA,Candlewood Suites Orange County/Irvine East,3 S Pointe Dr,92630
+926,Orange County,CA,Candlewood Suites Orange County/Irvine East,3 S Pointe Dr,92630
 927,Lake George,NY,Park Lane Motel,378 Canada St,12845
 928,Lake Mary,FL,Hampton Inn Suites Lake Mary At Colonial Townpark,850 Village Oak Ln,32746
 929,Lake Placid,NY,Best Western Adirondack Inn,2625 Main St,12946
@@ -1594,7 +1594,7 @@ hotel_id,city,province,name,address,postalcode
 1593,Sierra Vista,AZ,Quality Inn,1631 S Highway 92,85635
 1594,Sikeston,MO,Best Western Plus Sikeston,120 S Interstate Dr,63801
 1595,Sikeston,MO,Drury Inn Suites Sikeston,2608 E Malone Ave,63801
-1596,Silver Spring,MD,DoubleTree by Hilton Hotel Washington DC - Silver Spring,8727 Colesville Rd,20910
+1596,Washington DC,WA,DoubleTree by Hilton Hotel Washington DC - Silver Spring,8727 Colesville Rd,20910
 1597,Silverdale,WA,Oxford Suites Silverdale,9550 Silverdale Way NW,98383
 1598,Silverton,CO,Grand Imperial Hotel,1219 Greene St,81433
 1599,Simpsonville,SC,Hampton Inn Greenville/simpsonville,3934 Grandview Dr,29680
@@ -1639,7 +1639,7 @@ hotel_id,city,province,name,address,postalcode
 1638,Springfield,MA,Hampton Inn & Suites Springfield/Downtown,851 E Columbus Ave,1105
 1639,Springfield,OH,Hampton Inn Springfield,101 W Leffel Ln,45505
 1640,Springfield,MO,Hampton Inn Springfield South,3232 S. Glenstone,65804
-1641,Springfield,VA,Holiday Inn Express Washington Dc Sw - Springfield,6401 Brandon Ave,22150
+1641,Washington DC,WA,Holiday Inn Express Washington Dc Sw - Springfield,6401 Brandon Ave,22150
 1642,Springfield,IL,Residence Inn Springfield South,2915 Stanford Ave,62703
 1643,Springfield,CO,Stage Stop Hotel,1033 Main St,81073
 1644,Springfield,MO,hampton inn Springfield southeast,3370 E Montclair St,65804
