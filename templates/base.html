@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+    <script src="https://kit.fontawesome.com/9ccf722acc.js" crossorigin="anonymous"></script>
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    <header class="navbar" style="padding: 10px !important;">
+        <section class="navbar-section"></section>
+        <section class="navbar-center">
+            <a href="#" class="navbar-brand mr-2"><strong><i class="fas fa-plane-departure"></i> healTrip</strong></a>
+        </section>
+        <section class="navbar-section">
+            <a href="..." class="btn btn-link">login</a>
+            <a href="..." class="btn btn-link">contact</a>
+            <a href="https://github.com/vishalBindal/Heal-trip" class="btn btn-link"><i class="fab fa-github"></i> GitHub</a>
+        </section>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <div class="divider"></div>
+        <footer>
+            <br>
+            <div class="container">
+                <div class="columns">
+                    <div class="column col-1">
+                    </div>
+                    <div class="column col-10">
+                        <p class="textCenter"> Designed and built by <span class="chip">Chirag Mohapatra</span>, <span class="chip">Vishal Bindal</span> and <span class="chip">Vishal Singh</span> for COL362(DBMS) of<img style="vertical-align:middle;" src="/static/images/IITDlogo.png" width="40px">IIT DELHI. Licensed under the <a href="https://github.com/picturepan2/spectre/blob/master/LICENSE" target="_blank">MIT License</a>.</p>
+                    </div>
+                    <div class="column col-1"></div>
+                </div>
+            </div>
+        </footer>
+</body>
+</html>
