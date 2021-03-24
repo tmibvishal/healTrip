@@ -27,7 +27,6 @@ create table hotels(
     address text,
     postalcode text,
     constraint hotel_key primary key (hotel_id)
-    -- constraint city_ref foreign key (city, state_code) references airport_codes(city, state_code)
 );
 
 create table reviews(
