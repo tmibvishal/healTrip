@@ -1,4 +1,4 @@
-hotel_id,city,province,name,address,postalcode
+hotel_id,city,state_code,name,address,postalcode
 1,Abilene,TX,Americas Best Value Inn Suites-Abilene Mall,3165 S Danville Dr,79605
 2,Abilene,TX,Western Motel,3201 S 1st St,79605
 3,Abingdon,VA,Alpine Motel,882 E Main St,24210

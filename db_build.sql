@@ -1,28 +1,33 @@
 create table airport_codes(
     city text ,
     state_code text ,
-    country text ,
-    airport_code text
+    airport_code text,
+    constraint airport_key primary key (airport_code)
 );
 
 create table flights(
+    flight_id integer,
     fl_date date ,
     op_carrier text ,
     origin text ,
     dest text ,
     crs_dep_time integer ,
     crs_arr_time integer ,
-    distance integer
+    distance integer,
+    constraint flight_key primary key (flight_id),
+    constraint origin_ref foreign key (origin) references airport_codes(airport_code),
+    constraint dest_ref foreign key (dest) references airport_codes(airport_code)
 );
 
 create table hotels(
     hotel_id integer,
     city text,
-    province text,
+    state_code text,
     name text,
     address text,
     postalcode text,
     constraint hotel_key primary key (hotel_id)
+    -- constraint city_ref foreign key (city, state_code) references airport_codes(city, state_code)
 );
 
 create table reviews(
@@ -37,16 +42,15 @@ create table reviews(
     constraint hotel_ref foreign key (hotel_id) references hotels(hotel_id)
 );
 
-create table cities(
-    city text ,
-    city_ascii text ,
-    state_id text ,
-    state_name text
+create table states(
+    state_code text,
+    state_name text,
+    constraint state_key primary key (state_code)
 );
 
-\copy flights from 'data/flights.csv' delimiter ',' csv header;
 \copy airport_codes from 'data/codes.csv' delimiter ',' csv header;
+\copy flights from 'data/flights.csv' delimiter ',' csv header;
 \copy hotels from 'data/hotels.csv' delimiter ',' csv header;
 \copy reviews from 'data/reviews.csv' delimiter ',' csv header;
-\copy cities from 'data/us_cities.csv' delimiter ',' csv header;
+\copy states from 'data/states.csv' delimiter ',' csv header;
 
