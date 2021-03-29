@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for, render_template
 
-app = Flask(__name__, static_url_path='/templates/src')
+app = Flask(__name__, static_url_path='', static_folder='FRONT_END/src', template_folder='FRONT_END')
 
 @app.route("/")
 def index():
@@ -15,4 +15,4 @@ def admin():
 	return redirect(url_for("user", name="Vishal Singh (Admin)"))
 
 if __name__ == "__main__":
-	app.run(debug=True)
+	app.run(debug=True, port=5022)
