@@ -1,4 +1,5 @@
-from flask import Flask, redirect, url_for, render_template, request
+from datetime import date, datetime
+from flask import Flask, redirect, url_for, render_template, request, json
 import db
 
 app = Flask(__name__, static_url_path='/FRONT_END/src', static_folder='FRONT_END/src', template_folder='FRONT_END')
@@ -9,7 +10,19 @@ def index():
 
 @app.route("/order_cities")
 def order_cities():
-	return render_template("order_cities.html")
+	travelObj = {"sourceCity": "Seattle", "departureDate": date.today()}
+	return render_template("order_cities.html", travelObj=travelObj)
+
+@app.route("/output_page", methods=["GET", "POST"])
+def output_page():
+	if request.method == "POST":
+		print("hello")
+		t = request.form.get('json')
+		travelObj = json.loads(t)
+		print(travelObj)
+		return render_template("output_page.html", travelObj=travelObj)
+	travelObj = {"sourceCity": "YoYo", "departureDate": date.today()}
+	return render_template("output_page.html", travelObj=travelObj)
 
 @app.route("/<name>")
 def user(name):

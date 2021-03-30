@@ -23,6 +23,10 @@
         Order the cities in a order you want to visit them and add stay period in number of days
       </blockquote>
       <div class="card shadowContainer">
+        <div class="card-header">
+          <span class="label label-rounded mr-1">Source City: {{ travelObj["sourceCity"] }}</span>
+          <span class="label label-rounded mr-1">Departure Date: {{ travelObj["departureDate"] }}</span>
+        </div>
         <div class="card-body">
           <table class="table" id="table">
             <thead>
@@ -32,6 +36,7 @@
               </tr>
             </thead>
             <tbody>
+              
               <tr class="selectableTr">
                 <td>New York</td>
                 <td><input class="form-input input-sm" type="number" placeholder="days" value="1"></td>
@@ -55,8 +60,8 @@
         </div>
       </div>
       <br>
-      <button class="btn btn-primary btn-lg">Visit cities in order given</button>
-      <button class="btn btn-primary btn-lg">Choose best order</button>
+      <button class="btn btn-primary btn-lg" onclick="sendRequest(0)">Visit Cities in Order Given</button>
+      <button class="btn btn-primary btn-lg" onclick="sendRequest(1)">Choose Best Order</button>
       <br>
     </div>
     <div class="column col-3 col-lg-2 col-xs-0"></div>
@@ -101,6 +106,41 @@
         index++;
       }
     }
+  }
+
+  
+  
+  function sendRequest(chooseBestOrdering) {
+    let arr = []
+    let rows = document.getElementById("table").rows;
+    for (var i = 1; i < table.rows.length; i++) {
+      let cityName = rows[i].children[0].innerText
+      let stayPeriod = Number(rows[i].children[1].firstElementChild.value)
+      arr.push({"cityName": cityName, "stayPeriod": stayPeriod})
+    } 
+
+    let travelObj = {
+      "sourceCity": "New york",
+      "departureDate": new Date(),
+      "chooseBestOrdering": chooseBestOrdering,
+      "citiesToVisit": arr
+    }
+
+    post("/output_page", {"json": JSON.stringify(travelObj)});
+
+    // ajax does not redirect
+    // $.ajax({
+    //     url: '/output_page',
+    //     type: 'POST',
+    //     data: JSON.stringify(arr),
+    //     contentType: 'application/json; charset=utf-8',
+    //     dataType: 'json',
+    //     async: true,
+    //     success: function(msg) {
+    //         alert(msg);
+    //         print(msg)
+    //     }
+    // });
   }
 </script>
 
