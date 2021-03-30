@@ -19,6 +19,10 @@ def user(name):
 def admin():
 	return redirect(url_for("user", name="Vishal Singh (Admin)"))
 
+@app.route("/login")
+def login():
+	return render_template('login.html')
+
 # example of database
 @app.route('/toys', methods=["GET", "POST"])
 def toys():
