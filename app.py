@@ -105,6 +105,10 @@ def index():
 def order_cities():
 	return render_template("order_cities.html")
 
+@app.route("/home")
+def home():
+	return render_template("home.html")
+
 @app.route("/profile")
 @login_required
 def profile():

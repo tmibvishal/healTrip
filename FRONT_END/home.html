@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Home page{% endblock %}
+{% block content %}
+<div class="container customContainer">
+  <div class="columns">
+    <div class="column col-3 col-lg-2 col-xs-0"></div>
+    <div class="column col-6 col-lg-8 col-xs-12">
+      <h4><i class="fas fa-sort"></i> Home Page</h4>
+      <ul class="step">
+        <li class="step-item">
+          <a href="#" class="tooltip" data-tooltip="Choose from and vacation destination cities">Home</a>
+        </li>
+        <li class="step-item active">
+          <a href="#" class="tooltip"
+            data-tooltip="Order the cities in which you want to visit them and add stay period in number of days">Order
+            Cities</a>
+        </li>
+        <li class="step-item">
+          <a href="#" class="tooltip" data-tooltip="Choose hotels and finalize">Choose Hotels</a>
+        </li>
+      </ul>
+      <blockquote>
+        Choose origin city and departure date and then choose a particular city or a list of cities and let us plan the perfect trip for you!
+      </blockquote>
+      <div class="card shadowContainer">
+        <div class="card-header">
+          <tr class="selectableTr">
+            <td>From</td>
+            <td id="From"><input class="form-input input-sm" type="text" placeholder="From"></td>
+          </tr>
+        </div>
+        <div class="card-body">
+          <tr class="selectableTr">
+            <td>Departure Date</td>
+            <td id = "depdate"><input class="form-input input-sm" type="date" placeholder="Departure Date"></td>
+          </tr>
+        </div>
+      </div>
+
+      <div class="card shadowContainer">
+        <div class="card-header">
+          <p> Select the cities you would want to travel to and let us plan the trip for you!</p>
+        </div>
+
+        <div class="card-body">
+          <tr class="selectableTr">
+            <td>Select cities:</td>
+            <br>
+            <td>
+              <table id = "citytable">
+              <input type="text" id="cities" name="cities">
+              </table>
+              <button class="btn btn-primary btn-sm" onclick="addRow('citytable')">Add another city</button>
+            </td>
+            <br>
+            <br>
+            <button class="btn btn-primary btn-sm" onclick="sendRequest(0)">Show best route and hotels</button>
+          </tr>
+          <br>
+          <br>
+        </div>
+      </div>
+    </div>
+    <div class="column col-3 col-lg-2 col-xs-0"></div>
+  </div>
+</div>
+
+<script>
+  
+  function sendRequest(index) {
+    if(index == 0){
+      let src_city = document.getElementById("from").text();
+      let dep_date = document.getElementById("depdate").Date();
+
+      let arr = []
+      let rows = document.getElementById("citytable").rows;
+      for (var i = 1; i < table.rows.length; i++) {
+        let cityName = rows[i].children[0].innerText
+        arr.push(cityName)
+      } 
+
+      let travelObj = {
+        "sourceCity": src_city,
+        "departureDate": dep_date,
+        "citiesToVisit": arr
+      }
+
+      post("/order_cities", {"json": JSON.stringify(travelObj)});
+    }
+
+    // ajax does not redirect
+    // $.ajax({
+    //     url: '/output_page',
+    //     type: 'POST',
+    //     data: JSON.stringify(arr),
+    //     contentType: 'application/json; charset=utf-8',
+    //     dataType: 'json',
+    //     async: true,
+    //     success: function(msg) {
+    //         alert(msg);
+    //         print(msg)
+    //     }
+    // });
+  }
+
+  function addRow(tableID){
+    var table = document.getElementById(tableID);  
+    var rowCount = table.rows.length;  
+    var row = table.insertRow(rowCount);
+    var cell1 = row.insertCell(0);
+    var element1 = document.createElement("input");
+    element1.type = "text";
+    cell1.appendChild(element1);
+  }
+
+</script>
+
+{% endblock %}
