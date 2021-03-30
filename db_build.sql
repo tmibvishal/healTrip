@@ -7,6 +7,17 @@ create table users(
     constraint unique_username UNIQUE (uname)
 );
 
+create table bookings(
+    userid integer,
+    source_airport_code: text,
+    departure_date: Date,
+    visiting_cities_airport_codes: text[],
+    all_flights_ids: integer[][],
+    visiting_cities_hotels: integer[],
+    visiting_cities_stay_periods: integer[],
+    constraint user_key foreign key (userid) references users(userid)
+);
+
 create table airport_codes(
     city text ,
     state_code text ,
