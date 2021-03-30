@@ -23,6 +23,10 @@ def admin():
 def login():
 	return render_template('login.html')
 
+@app.route("/register")
+def register():
+	return render_template('register.html')
+
 # example of database
 @app.route('/toys', methods=["GET", "POST"])
 def toys():

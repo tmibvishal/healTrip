@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
     <script src="https://kit.fontawesome.com/9ccf722acc.js" crossorigin="anonymous"></script>
     <title>{% block title %}{% endblock %}</title>
 </head>
@@ -18,17 +19,18 @@
             <a href="/" class="navbar-brand mr-2"><strong><i class="fas fa-plane-departure"></i> healTrip</strong></a>
         </section>
         <section class="navbar-section">
-            <a href="/login" class="btn btn-link">login</a>
-            <a href="..." class="btn btn-link">contact</a>
-            <a href="https://github.com/vishalBindal/Heal-trip" class="btn btn-link"><i class="fab fa-github"></i> GitHub</a>
+            <a href="/login" class="btn btn-link">Login</a>
+            <a href="/register" class="btn btn-link">Register</a>
+            <a href="..." class="btn btn-link">Contact</a>
+            <a href="https://github.com/tmibvishal/Heal-trip" class="btn btn-link"><i class="fab fa-github"></i> GitHub</a>
         </section>
     </header>
     <div class="divider"></div>
     <main>
         {% block content %}{% endblock %}
     </main>
-    <div class="divider"></div>
     <footer>
+        <div class="divider"></div>
         <br>
         <div class="container">
             <div class="columns">
