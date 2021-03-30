@@ -1,0 +1,22 @@
+.customContainer {
+    padding: 10px !important;
+}
+
+.textCenter {
+    text-align: center !important;
+}
+
+.shadowContainer {
+    padding: 10px !important;
+    box-shadow: 0 0.25rem 1rem rgba(48, 55, 66, .15) !important;
+}
+
+#map {
+    height: 50vh;
+}
+
+/* html, body {
+      height: 100%;
+      /* margin: 0;
+      padding: 0; 
+  }*/
