@@ -119,6 +119,19 @@ def output_page():
 	travelObj = {"sourceCity": "YoYo", "departureDate": date.today()}
 	return render_template("output_page.html", travelObj=travelObj)
 
+def process_data(travelObj):
+	# TODO: try to take input of gap time
+	query = """
+	WITH RECURSIVE all_paths(originairportid, destairportid, curpath, arr_date, arr_time) AS (
+		SELECT originairportid, destairportid, ARRAY[originairportid, destairportid], (CASE WHEN (crs_dep_time<crs_arr_time) THEN fl_date ELSE  (fl_date+INTERVAL '1 day')), crs_arr_time FROM (flights F JOIN airport_codes AC ON (F.origin=AC.airport_code AND city="Chicago"))
+		UNION
+		SELECT all_paths.originairportid, flights.destairportid, array_append(curpath, flights.destairportid), (CASE WHEN (crs_dep_time<crs_arr_time) THEN fl_date ELSE  (fl_date+INTERVAL '1 day')), crs_arr_time FROM all_paths, flights WHERE (all_paths.destairportid=flights.originairportid AND NOT (flights.destairportid = ANY(curpath)) AND (crs_dep_time<crs_arr_time OR arr_date<fl_date))
+	)
+	SELECT originairportid, destairportid, arr_date, arr_time AS length FROM (
+		all_paths AP JOIN airport_codes AC ON (AC.airport_code=AP.destairportid AND AC.city="Dallas")
+	) ORDER BY arr_date DESC, arr_time DESC LIMIT 1;
+	"""
+
 @app.route("/profile")
 @login_required
 def profile():
