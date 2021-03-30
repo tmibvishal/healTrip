@@ -26,13 +26,13 @@
         <div class="card-header">
           <tr class="selectableTr">
             <td>From</td>
-            <td id="From"><input class="form-input input-sm" type="text" placeholder="From"></td>
+            <td><input class="form-input input-sm" id="From" type="text" placeholder="From"></td>
           </tr>
         </div>
         <div class="card-body">
           <tr class="selectableTr">
             <td>Departure Date</td>
-            <td id = "depdate"><input class="form-input input-sm" type="date" placeholder="Departure Date"></td>
+            <td><input class="form-input input-sm" id = "depdate" type="date" placeholder="Departure Date"></td>
           </tr>
         </div>
       </div>
@@ -48,12 +48,14 @@
             <br>
             <td>
               <table id = "citytable">
-              <input type="text" id="cities" name="cities">
+              <input type="text">
               </table>
               <button class="btn btn-primary btn-sm" onclick="addRow('citytable')">Add another city</button>
             </td>
             <br>
             <br>
+            <input type="checkbox" id="round_trip" name="round_trip" value="Yes">
+            <label for="round_trip"> Round trip</label><br>
             <button class="btn btn-primary btn-sm" onclick="sendRequest(0)">Show best route and hotels</button>
           </tr>
           <br>
@@ -69,15 +71,19 @@
   
   function sendRequest(index) {
     if(index == 0){
-      let src_city = document.getElementById("from").text();
-      let dep_date = document.getElementById("depdate").Date();
+      var src_city = document.getElementById("From").value;
+      //console.log(src_city);
+      var dep_date = document.getElementById("depdate").value;
+      //console.log(dep_date);
 
       let arr = []
       let rows = document.getElementById("citytable").rows;
-      for (var i = 1; i < table.rows.length; i++) {
-        let cityName = rows[i].children[0].innerText
-        arr.push(cityName)
+      for (var i = 1; i < rows.length; i++) {
+        var cityName = rows.item(i).cells.item(0).innerHTML;
+        arr.push(cityName);
       } 
+
+      console.log(arr);
 
       let travelObj = {
         "sourceCity": src_city,
