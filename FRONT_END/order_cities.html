@@ -5,38 +5,103 @@
   <div class="columns">
     <div class="column col-3 col-lg-2 col-xs-0"></div>
     <div class="column col-6 col-lg-8 col-xs-12">
-      <h3><i class="fas fa-sort"></i> Cities Ordering</h3>
+      <h4><i class="fas fa-sort"></i> Cities Ordering</h4>
+      <ul class="step">
+        <li class="step-item">
+          <a href="#" class="tooltip" data-tooltip="Choose from and vacation destination cities">Home</a>
+        </li>
+        <li class="step-item active">
+          <a href="#" class="tooltip"
+            data-tooltip="Order the cities in which you want to visit them and add stay period in number of days">Order
+            Cities</a>
+        </li>
+        <li class="step-item">
+          <a href="#" class="tooltip" data-tooltip="Choose hotels and finalize">Choose Hotels</a>
+        </li>
+      </ul>
       <blockquote>
-        Order the cities
+        Order the cities in a order you want to visit them and add stay period in number of days
       </blockquote>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>City</th>
-            <th>Stay Period (in no. of days)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Neywork</td>
-            <td><input class="form-input input" type="number" placeholder="days"></td>
-          </tr>
-          <tr class="active">
-            <td>Neywork</td>
-            <td><input class="form-input input" type="number" placeholder="days"></td>
-          </tr>
-          <tr>
-            <td>Neywork</td>
-            <td><input class="form-input input" type="number" placeholder="days"></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="card shadowContainer">
+        <div class="card-body">
+          <table class="table" id="table">
+            <thead>
+              <tr class="selectableTr">
+                <th>City</th>
+                <th>Stay Period (in no. of days)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="selectableTr">
+                <td>New York</td>
+                <td><input class="form-input input-sm" type="number" placeholder="days" value="1"></td>
+              </tr>
+              <tr class="selectableTr">
+                <td>Washington</td>
+                <td><input class="form-input input-sm" type="number" placeholder="days" value="2"></td>
+              </tr>
+              <tr class="selectableTr">
+                <td>Palo Alto</td>
+                <td><input class="form-input input-sm" type="number" placeholder="days" value="3"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-primary btn-action s-circle" onclick="upNdown('up');"><i
+              class="icon icon-arrow-up"></i></button>
+          <button class="btn btn-primary btn-action s-circle" onclick="upNdown('down');"><i
+              class="icon icon-arrow-down"></i></button>
+        </div>
+      </div>
       <br>
-      <button class="btn btn-primary btn-action btn-lg"><i class="icon icon-arrow-up"></i></button>
-      <button class="btn btn-primary btn-action btn-lg"><i class="icon icon-arrow-down"></i></button>
+      <button class="btn btn-primary btn-lg">Visit cities in order given</button>
+      <button class="btn btn-primary btn-lg">Choose best order</button>
       <br>
     </div>
     <div class="column col-3 col-lg-2 col-xs-0"></div>
   </div>
 </div>
+
+<script>
+  let index; // variable to set the selected row index
+  function getSelectedRow() {
+    let table = document.getElementById("table");
+    for (var i = 1; i < table.rows.length; i++) {
+      table.rows[i].onclick = function () {
+        // clear the selected from the previous selected row
+        // the first time index is undefined
+        if (typeof index !== "undefined") {
+          table.rows[index].classList.toggle("active");
+        }
+        index = this.rowIndex;
+        this.classList.toggle("active");
+      };
+    }
+
+  }
+
+  getSelectedRow();
+
+  function upNdown(direction) {
+    var rows = document.getElementById("table").rows,
+      parent = rows[index].parentNode;
+    if (direction === "up") {
+      if (index > 1) {
+        parent.insertBefore(rows[index], rows[index - 1]);
+        // when the row go up the index will be equal to index - 1
+        index--;
+      }
+    }
+
+    if (direction === "down") {
+      if (index < rows.length - 1) {
+        parent.insertBefore(rows[index + 1], rows[index]);
+        // when the row go down the index will be equal to index + 1
+        index++;
+      }
+    }
+  }
+</script>
+
 {% endblock %}
