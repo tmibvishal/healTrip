@@ -1,3 +1,12 @@
+create table users(
+    userid serial,
+    uname text NOT NULL,
+    email text ,
+    pass text,
+    constraint users_key PRIMARY KEY (userid),
+    constraint unique_username UNIQUE (uname)
+);
+
 create table airport_codes(
     city text ,
     state_code text ,

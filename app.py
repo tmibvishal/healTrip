@@ -1,4 +1,5 @@
-from flask import Flask, redirect, url_for, render_template
+from flask import Flask, redirect, url_for, render_template, request
+import db
 
 app = Flask(__name__, static_url_path='/FRONT_END/src', static_folder='FRONT_END/src', template_folder='FRONT_END')
 
@@ -18,5 +19,15 @@ def user(name):
 def admin():
 	return redirect(url_for("user", name="Vishal Singh (Admin)"))
 
+# example of database
+@app.route('/toys', methods=["GET", "POST"])
+def toys():
+    if request.method == "POST":
+        db.add_toy(request.form['name'])
+        return redirect(url_for('index'))
+    return render_template('dbexample.html', toys=db.get_all_toys())
+
 if __name__ == "__main__":
+	
+	# if not first time then remove this
 	app.run(debug=True, port=5022)
