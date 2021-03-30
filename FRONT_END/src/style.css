@@ -15,6 +15,17 @@
     height: 50vh;
 }
 
+body{ height:100vh; margin:0; }
+
+body{ 
+  display:flex; 
+  flex-direction:column; 
+}
+
+footer{
+  margin-top:auto; 
+}
+
 /* html, body {
       height: 100%;
       /* margin: 0;
