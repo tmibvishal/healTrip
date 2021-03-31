@@ -3,8 +3,8 @@
 {% block content %}
 <div class="container">
   <div class="columns">
-    <div class="column col-3"></div>
-    <div class="column col-6">
+    <div class="column col-4"></div>
+    <div class="column col-4">
       <ul class="breadcrumb">
         <li class="breadcrumb-item">
           <a href="/">Home</a>
@@ -35,6 +35,8 @@
         </div>
       </div>
       <br>
+      <div class='divider'></div>
+      <h3>Your bookings</h3>
       {% if num_bookings == 0 %}
       <div class="empty">
         <div class="empty-icon">
@@ -49,6 +51,23 @@
         </div>
       </div>
       {% endif %}
+      {% for booking in bookings %}
+      <div class="tile tile-centered">
+        <div class="tile-icon">
+            <i class="fas fa-suitcase-rolling"></i>
+        </div>
+        <div class="tile-content">
+          <div class="tile-title text-bold">{{booking['dep_date']}}</div>
+          <div class='tile-subtitle'>From {{booking['src_airport'][2]}}, {{booking['src_airport'][0]}}</div>
+          <div class="tile-subtitle">{{booking['num_flights']}} flights, {{booking['num_hotels']}} hotels</div>
+        </div>
+        <div class="tile-action">
+          <a href='/booking_details/{{ booking['id'] }}'>
+          <button class="btn btn-primary">View details</button>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
     </div>
   </div>
 </div>

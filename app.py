@@ -5,6 +5,7 @@ from datetime import date, datetime
 from flask import Flask, redirect, url_for, render_template, request, json
 import db
 import auth_queries as auth
+import profile_queries as prof
 
 app = Flask(__name__, static_url_path='/FRONT_END/src', static_folder='FRONT_END/src', template_folder='FRONT_END')
 app.config['SECRET_KEY'] = 'we are the champions'
@@ -123,11 +124,63 @@ def output_page():
 @login_required
 def profile():
 	user = auth.get_user_from_userid(current_user.id)
-	user_bookings = auth.get_user_bookings(current_user.id)
+	user_bookings = prof.get_user_bookings(current_user.id)
 	num_bookings = 0
+	bookings_data = []
 	for booking in user_bookings:
-		num_bookings += 1	
-	return render_template('profile.html', user_uname=user[1],user_email=user[2], num_bookings=num_bookings)
+		num_bookings += 1
+		src_airport = prof.get_airport_data(booking[2])[0]
+		dep_date = str(booking[3])
+		num_flights = prof.get_num_flights(booking[0])
+		num_hotels = prof.get_num_hotels(booking[0])
+		print(num_flights, num_hotels)
+		bookings_data.append({
+			'id':booking[0],
+			'src_airport':src_airport,
+			'dep_date':dep_date,
+			'num_hotels':num_hotels,
+			'num_flights':num_flights
+		})	
+	return render_template('profile.html', user_uname=user[1],user_email=user[2], num_bookings=num_bookings, bookings = bookings_data)
+
+@app.route('/booking_details/<booking_id>')
+@login_required
+def booking_details(booking_id):
+	booking = prof.get_booking(booking_id)
+	if len(booking)==0:
+		return render_template('404.html')
+	booking = booking[0]
+	dep_date = str(booking[3])
+	if booking[1] != current_user.id:
+		return render_template('invalid_access.html')
+	booking_entries = prof.get_booking_entries(booking_id)
+	entries = []
+	for booking_entry in booking_entries:
+		if(booking_entry[2]): # hotel
+			hotel = prof.get_hotel(booking_entry[3])
+			hotel = hotel[0]
+			entries.append({
+				'is_hotel':True,
+				'hotel_name':hotel[3],
+				'hotel_city':hotel[1],
+				'stay_period':booking_entry[4]
+			})
+		else:
+			flight = prof.get_flight(booking_entry[3])[0]
+			origin_airport = prof.get_airport_data(flight[3])[0]
+			dest_airport = prof.get_airport_data(flight[4])[0]
+			entries.append({
+				'is_hotel':False,
+				'origin_code':origin_airport[2],
+				'origin_city':origin_airport[0],
+				'dest_code':dest_airport[2],
+				'dest_city':dest_airport[0],
+				'dep_time':str(flight[5])[:-2] + ':' + str(flight[5])[-2:],
+				'arr_time':str(flight[6])[:-2] + ':' + str(flight[6])[-2:],
+				'date':str(flight[1]),
+				'carrier':flight[2]
+			})
+	return render_template('booking_details.html', entries=entries, dep_date=dep_date)
 
 @app.route("/<name>")
 def user(name):
