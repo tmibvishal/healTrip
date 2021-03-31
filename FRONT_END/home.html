@@ -48,14 +48,14 @@
           <table id = "citytable">
           <tr class="selectableTr">
             <td>
-              <input id="cities" name="cities" type="text">
+              <input class="form-input input-sm" id = "cities0" type="text" placeholder="..">
             </td>
           </tr>
           </table>
             <button class="btn btn-primary btn-sm" onclick="addRow('citytable')">Add another city</button>
             <br>
             <br>
-            <input type="checkbox" id="round_trip" name="round_trip" value="Yes">
+            <input type="checkbox" id="round_trip" name="round_trip">
             <label for="round_trip"> Round trip</label><br>
             <button class="btn btn-primary btn-sm" onclick="sendRequest(0)">Show best route and hotels</button>
           <br>
@@ -78,18 +78,22 @@
 
       let arr = []
       let rows = document.getElementById("citytable").rows;
-      for (var i = 1; i < rows.length; i++) {
-        var cityName = rows.item(i).cells.item(0).innerHTML;
+      for (var i = 0; i < rows.length; i++) {
+        var cityName = document.getElementById("cities" + i.toString()).value;
+        //var cityName = rows.item(i).cells.item(0).value;
         arr.push(cityName);
-      } 
+      }
+
+      var round_trip = document.getElementById("round_trip").checked;
 
       let travelObj = {
         "sourceCity": src_city,
         "departureDate": dep_date,
-        "citiesToVisit": arr
+        "citiesToVisit": arr,
+        "roundTrip": round_trip
       }
 
-      post("/order_cities", {"json": JSON.stringify(travelObj)});
+      //post("/order_cities", {"json": JSON.stringify(travelObj)});
     }
 
     // ajax does not redirect
@@ -113,7 +117,10 @@
     var row = table.insertRow(rowCount);
     var cell1 = row.insertCell(0);
     var element1 = document.createElement("input");
+    element1.class="form-input input-sm";
+    element1.id = "cities" + rowCount.toString();
     element1.type = "text";
+    element1.placeholder = "..";
     cell1.appendChild(element1);
   }
 
