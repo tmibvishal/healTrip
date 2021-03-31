@@ -5,6 +5,7 @@ from datetime import date, datetime
 from flask import Flask, redirect, url_for, render_template, request, json
 import db
 import auth_queries as auth
+import mainpage_queries as mpq
 import profile_queries as prof
 
 app = Flask(__name__, static_url_path='/FRONT_END/src', static_folder='FRONT_END/src', template_folder='FRONT_END')
@@ -13,6 +14,8 @@ app.config['SECRET_KEY'] = 'we are the champions'
 # Setting up auth
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+initialise_autocomplete = False
 
 class User:
 	def __init__(self, user):
@@ -99,7 +102,6 @@ def logout():
 	logout_user()
 	return redirect(url_for('index'))
 
-
 @app.route("/")
 def index():
 	return render_template("index.html")
@@ -123,6 +125,25 @@ def output_page():
 @app.route("/home")
 def home():
 	return render_template("home.html")
+
+# check these methods for autocomplete
+@app.route("/home" , methods=["GET"])
+def init_autocomplete():
+	mpq.init_autocomplete()
+	initialise_autocomplete = True
+	#complete rest
+
+def get_cities(input):
+	if not initialise_autocomplete:
+		init_autocomplete()
+	cities = mpq.get_all_cities(input)
+	return cities
+
+# complete this method to render the covid status
+def get_covid_status(city):
+	status = mpq.get_covid_status(city)
+	return status
+
 
 @app.route("/profile")
 @login_required
