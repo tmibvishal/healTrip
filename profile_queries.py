@@ -42,7 +42,25 @@ def get_booking_entries(booking_id):
     return fetch(f'select * from booking_entry where booking_id={booking_id} order by id')
 
 def get_hotel(hotel_id):
-    return fetch(f'select * from hotels where hotel_id={hotel_id}')
+    hotels = fetch(f'select * from hotels where hotel_id={hotel_id}')
+    if len(hotels) != 1:
+        print(hotel_id, ' hotel not found')
+        return None
+    return hotels[0]
 
 def get_flight(flight_id):
-    return fetch(f'select * from flights where flight_id={flight_id}')
+    flights = fetch(f'select * from flights where flight_id={flight_id}')
+    if len(flights) != 1:
+        print(flight_id, ' flight not found')
+        return None
+    return flights[0]
+
+def get_reviews(hotel_id):
+    return fetch(f'select * from reviews where hotel_id={hotel_id}')
+
+def get_state(state_code):
+    states = fetch(f"select state_name from states where state_code='{state_code}'")
+    if len(states) != 1:
+        print(state_code, 'not found')
+        return None
+    return states[0][0]
