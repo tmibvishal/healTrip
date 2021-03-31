@@ -21,6 +21,7 @@
           </div>
         {% endif %}
       {% endwith %}
+      <br>
       <div class="tile tile-centered">
         <div class="tile-content">
           <div class="tile-title text-bold">E-mail</div>
@@ -31,7 +32,9 @@
           <div class="tile-subtitle">{{ user_uname }}</div>
         </div>
         <div class="tile-action">
+          <a href='/edit_profile'>
           <button class="btn btn-link btn-action btn-lg tooltip tooltip-left" data-tooltip="Edit user details"><i class="icon icon-edit"></i></button>
+          </a>
         </div>
       </div>
       <br>

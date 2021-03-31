@@ -41,3 +41,9 @@ def get_user_from_userid(userid):
     if len(users) != 1:
         return None
     return users[0]
+
+def update_user_details(userid, uname, email):
+    commit(f"update users set uname='{uname}', email='{email}' where userid={userid}")
+
+def update_password(userid, password):
+    commit(f"update users set pass='{password}' where userid={userid}")
