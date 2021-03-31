@@ -7,6 +7,7 @@ import db
 import auth_queries as auth
 import mainpage_queries as mpq
 import profile_queries as prof
+import home_page_queries
 
 app = Flask(__name__, static_url_path='/FRONT_END/src', static_folder='FRONT_END/src', template_folder='FRONT_END')
 app.config['SECRET_KEY'] = 'we are the champions'
@@ -122,6 +123,19 @@ def output_page():
 	travelObj = {"sourceCity": "YoYo", "departureDate": date.today()}
 	return render_template("output_page.html", travelObj=travelObj)
 
+def process_data(travelObj):
+	# TODO: try to take input of gap time
+	query = """
+	WITH RECURSIVE all_paths(originairportid, destairportid, curpath, arr_date, arr_time) AS (
+		SELECT originairportid, destairportid, ARRAY[originairportid, destairportid], (CASE WHEN (crs_dep_time<crs_arr_time) THEN fl_date ELSE  (fl_date+INTERVAL '1 day')), crs_arr_time FROM (flights F JOIN airport_codes AC ON (F.origin=AC.airport_code AND city="Chicago"))
+		UNION
+		SELECT all_paths.originairportid, flights.destairportid, array_append(curpath, flights.destairportid), (CASE WHEN (crs_dep_time<crs_arr_time) THEN fl_date ELSE  (fl_date+INTERVAL '1 day')), crs_arr_time FROM all_paths, flights WHERE (all_paths.destairportid=flights.originairportid AND NOT (flights.destairportid = ANY(curpath)) AND (crs_dep_time<crs_arr_time OR arr_date<fl_date))
+	)
+	SELECT originairportid, destairportid, arr_date, arr_time AS length FROM (
+		all_paths AP JOIN airport_codes AC ON (AC.airport_code=AP.destairportid AND AC.city="Dallas")
+	) ORDER BY arr_date DESC, arr_time DESC LIMIT 1;
+	"""
+
 @app.route("/home")
 def home():
 	return render_template("home.html")
@@ -144,6 +158,13 @@ def get_covid_status(city):
 	status = mpq.get_covid_status(city)
 	return status
 
+@app.route("/city_name_suggestions", methods=["POST"])
+def city_name_suggestions():
+	# if request.method == "POST":
+	t = request.json
+	start_string_of_city = t["input_val"]
+	cities = home_page_queries.get_all_cities(start_string_of_city)
+	return {"arr": cities}
 
 @app.route("/profile")
 @login_required
@@ -167,6 +188,58 @@ def profile():
 			'num_flights':num_flights
 		})	
 	return render_template('profile.html', user_uname=user[1],user_email=user[2], num_bookings=num_bookings, bookings = bookings_data)
+
+@app.route('/edit_profile')
+@login_required
+def edit_profile():
+	user = auth.get_user_from_userid(current_user.id)
+	return render_template('edit_profile.html', uname=user[1], email=user[2])
+
+@app.route('/edit_profile', methods=['POST'])
+@login_required
+def edit_profile_post():
+	uname = request.form.get('uname')
+	email = request.form.get('email')
+
+	user = auth.get_user_from_uname(uname)
+	if user and user[0] != current_user.id:
+		flash('Username already taken')
+		return redirect(url_for('edit_profile'))
+	user = auth.get_user_from_email(email)
+	if user and user[0] != current_user.id:
+		flash('Another account with this email already exists')
+		return redirect(url_for('edit_profile'))
+	
+	auth.update_user_details(current_user.id, uname, email)
+	flash('Details updated')
+	return redirect(url_for('profile'))
+
+@app.route('/change_password', methods=['POST'])
+@login_required
+def change_password():
+	old_password = request.form.get('old_password')
+	new_password = request.form.get('new_password')
+
+	user = auth.get_user_from_userid(current_user.id)
+	if not check_password_hash(user[3], old_password):
+		flash('Old password is incorrect')
+		return redirect(url_for('edit_profile'))
+	if len(new_password)==0:
+		flash('Password cannot be empty')
+		return redirect(url_for('edit_profile'))
+	
+	auth.update_password(current_user.id, generate_password_hash(new_password))
+	flash('Password updated')
+	return redirect(url_for('profile')) 
+
+@app.route('/delete_user')
+@login_required
+def delete_user():
+	id = current_user.id
+	logout_user()
+	auth.delete_user(id)
+	flash('User deleted')
+	return redirect(url_for('login'))
 
 @app.route('/booking_details/<booking_id>')
 @login_required
@@ -224,6 +297,5 @@ def toys():
     return render_template('dbexample.html', toys=db.get_all_toys())
 
 if __name__ == "__main__":
-	
 	# if not first time then remove this
 	app.run(debug=True, port=5022)
