@@ -119,6 +119,10 @@ def output_page():
 	travelObj = {"sourceCity": "YoYo", "departureDate": date.today()}
 	return render_template("output_page.html", travelObj=travelObj)
 
+@app.route("/home")
+def home():
+	return render_template("home.html")
+
 @app.route("/profile")
 @login_required
 def profile():
