@@ -4,4 +4,4 @@ manage-csv.py
 resources.txt
 .vscode/
 __pycache__/
-manage_csv.py
+test_fill.sql
