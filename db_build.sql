@@ -15,8 +15,6 @@ create table airport_codes(
     constraint airport_key primary key (airport_code)
 );
 
-create index city_index on airport_codes(city); -- So that auto complete feature will work faster on home page --
-
 create table bookings(
     id serial,
     userid integer,
@@ -97,4 +95,24 @@ create table covid_status(
 \copy reviews from 'data/reviews.csv' delimiter ',' csv header;
 \copy states from 'data/states.csv' delimiter ',' csv header;
 \copy covid_status from 'data/covid_status.csv' delimiter ',' csv header;
+
+create index city_index on airport_codes(city); -- So that auto complete feature will work faster on home page --
+
+CREATE MATERIALIZED VIEW direct_con
+    as
+    select ac1.city as city1 , ac2.city as city2
+    from airport_codes as ac1 , airport_codes as ac2 , flights as fl
+    where fl.origin = ac1.airport_code and fl.dest = ac2.airport_code
+    group by ac1.city , ac2.city;
+
+create index direct_con_index on direct_con(city1,city2);
+
+create MATERIALIZED view hotels_rating
+as
+    select hotels.hotel_id , avg(review_rating) as rating
+    from hotels , reviews
+    where hotels.hotel_id = reviews.hotel_id
+    group by hotels.hotel_id;
+
+create index rating_index on hotels_rating(hotel_id);
 

@@ -30,8 +30,8 @@
       {% else %}
       <div class="card shadowContainer">
         <div class="card-header">
-          <span class="label label-rounded mr-1">Source City: {{ travelObj["sourceCity"] }}</span>
-          <span class="label label-rounded mr-1">Departure Date: {{ travelObj["departureDate"] }}</span>
+          <span class="label label-rounded mr-1" id = "src_city">Source City: {{ travelObj["sourceCity"] }}</span>
+          <span class="label label-rounded mr-1" id = "dep_date">Departure Date: {{ travelObj["departureDate"] }}</span>
         </div>
         <div class="card-body">
           <table class="table" id="table">
@@ -125,9 +125,15 @@
       })
     }
 
+    var src_text = document.getElementById("src_city").innerText;
+    var src_city = src_text.substring(13);
+
+    var dep_text = document.getElementById("dep_date").innerText;
+    var dep_date = dep_text.substring(16);
+
     let travelObj = {
-      "sourceCity": "New york",
-      "departureDate": new Date(),
+      "sourceCity": src_city,
+      "departureDate": dep_date,
       "chooseBestOrdering": chooseBestOrdering,
       "citiesToVisit": arr
     }
