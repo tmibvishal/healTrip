@@ -26,6 +26,10 @@ def get_all_cities(start):
     cities = fetch(f"select ac.city
 from airport_codes as ac
 where ac.city like ''{start}'%'
-group by ac.city;")
+group by ac.city")
     return cities
+
+def init_autocomplete():
+    commit(f"create index city_index on airport_codes(city)")
+
 
