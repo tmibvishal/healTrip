@@ -14,6 +14,8 @@ create table airport_codes(
     constraint airport_key primary key (airport_code)
 );
 
+create index city_index on airport_codes(city); -- So that auto complete feature will work faster on home page --
+
 create table bookings(
     id serial,
     userid integer,

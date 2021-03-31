@@ -6,6 +6,7 @@ from flask import Flask, redirect, url_for, render_template, request, json
 import db
 import auth_queries as auth
 import profile_queries as prof
+import home_page_queries
 
 app = Flask(__name__, static_url_path='/FRONT_END/src', static_folder='FRONT_END/src', template_folder='FRONT_END')
 app.config['SECRET_KEY'] = 'we are the champions'
@@ -137,6 +138,14 @@ def process_data(travelObj):
 def home():
 	return render_template("home.html")
 
+@app.route("/city_name_suggestions", methods=["POST"])
+def city_name_suggestions():
+	# if request.method == "POST":
+	t = request.json
+	start_string_of_city = t["input_val"]
+	cities = home_page_queries.get_all_cities(start_string_of_city)
+	return {"arr": cities}
+
 @app.route("/profile")
 @login_required
 def profile():
@@ -216,6 +225,5 @@ def toys():
     return render_template('dbexample.html', toys=db.get_all_toys())
 
 if __name__ == "__main__":
-	
 	# if not first time then remove this
 	app.run(debug=True, port=5022)
