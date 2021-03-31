@@ -90,7 +90,7 @@ create table covid_status(
 );
 
 \copy airport_codes from 'data/codes.csv' delimiter ',' csv header;
-\copy flights from 'data/flights.csv' delimiter ',' csv header;
+\copy flights from 'data/new_flights.csv' delimiter ',' csv header;
 \copy hotels from 'data/hotels.csv' delimiter ',' csv header;
 \copy reviews from 'data/reviews.csv' delimiter ',' csv header;
 \copy states from 'data/states.csv' delimiter ',' csv header;
