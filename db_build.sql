@@ -7,6 +7,13 @@ create table users(
     constraint unique_username UNIQUE (uname)
 );
 
+create table airport_codes(
+    city text ,
+    state_code text ,
+    airport_code text,
+    constraint airport_key primary key (airport_code)
+);
+
 create table bookings(
     id serial,
     userid integer,
@@ -25,13 +32,6 @@ create table booking_entry(
     stay_period integer, -- null for flight, no of days for hotel
     constraint bid_key primary key (id) ,
     constraint booking_ref foreign key (booking_id) references bookings(id)
-);
-
-create table airport_codes(
-    city text ,
-    state_code text ,
-    airport_code text,
-    constraint airport_key primary key (airport_code)
 );
 
 create table flights(
@@ -89,7 +89,7 @@ create table covid_status(
 );
 
 \copy airport_codes from 'data/codes.csv' delimiter ',' csv header;
-\copy flights from 'data/flights.csv' delimiter ',' csv header;
+\copy flights from 'data/new_flights.csv' delimiter ',' csv header;
 \copy hotels from 'data/hotels.csv' delimiter ',' csv header;
 \copy reviews from 'data/reviews.csv' delimiter ',' csv header;
 \copy states from 'data/states.csv' delimiter ',' csv header;
