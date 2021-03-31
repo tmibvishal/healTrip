@@ -3,6 +3,7 @@ create table users(
     uname text NOT NULL,
     email text ,
     pass text,
+    is_admin boolean,
     constraint users_key PRIMARY KEY (userid),
     constraint unique_username UNIQUE (uname)
 );
@@ -20,8 +21,8 @@ create table bookings(
     source_airport_code text,
     departure_date Date,
     constraint booking_key primary key (id),
-    constraint source_ref foreign key (source_airport_code) references airport_codes(airport_code),
-    constraint user_ref foreign key (userid) references users(userid)
+    constraint source_ref foreign key (source_airport_code) references airport_codes(airport_code) on delete set null,
+    constraint user_ref foreign key (userid) references users(userid) on delete cascade
 );
 
 create table booking_entry(
@@ -31,7 +32,7 @@ create table booking_entry(
     entry_id integer, -- flight id or hotel id
     stay_period integer, -- null for flight, no of days for hotel
     constraint entry_key primary key (id),
-    constraint booking_ref foreign key (booking_id) references bookings(id)
+    constraint booking_ref foreign key (booking_id) references bookings(id) on delete cascade
 );
 
 create table flights(
@@ -44,8 +45,8 @@ create table flights(
     crs_arr_time integer ,
     distance integer,
     constraint flight_key primary key (flight_id),
-    constraint origin_ref foreign key (origin) references airport_codes(airport_code),
-    constraint dest_ref foreign key (dest) references airport_codes(airport_code)
+    constraint origin_ref foreign key (origin) references airport_codes(airport_code) on delete cascade,
+    constraint dest_ref foreign key (dest) references airport_codes(airport_code) on delete cascade
 );
 
 create table hotels(
@@ -67,7 +68,7 @@ create table reviews(
     review_title text,
     review_text text,
     constraint review_key primary key (review_id),
-    constraint hotel_ref foreign key (hotel_id) references hotels(hotel_id)
+    constraint hotel_ref foreign key (hotel_id) references hotels(hotel_id) on delete cascade
 );
 
 create table states(

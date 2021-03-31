@@ -47,3 +47,6 @@ def update_user_details(userid, uname, email):
 
 def update_password(userid, password):
     commit(f"update users set pass='{password}' where userid={userid}")
+
+def delete_user(userid):
+    commit(f"delete from users where userid={userid}")

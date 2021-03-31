@@ -186,6 +186,14 @@ def change_password():
 	flash('Password updated')
 	return redirect(url_for('profile')) 
 
+@app.route('/delete_user')
+@login_required
+def delete_user():
+	id = current_user.id
+	logout_user()
+	auth.delete_user(id)
+	flash('User deleted')
+	return redirect(url_for('login'))
 
 @app.route('/booking_details/<booking_id>')
 @login_required
