@@ -7,6 +7,7 @@ import db
 import auth_queries as auth
 import mainpage_queries as mpq
 import profile_queries as prof
+import home_page_queries
 
 app = Flask(__name__, static_url_path='/FRONT_END/src', static_folder='FRONT_END/src', template_folder='FRONT_END')
 app.config['SECRET_KEY'] = 'we are the champions'
@@ -122,6 +123,19 @@ def output_page():
 	travelObj = {"sourceCity": "YoYo", "departureDate": date.today()}
 	return render_template("output_page.html", travelObj=travelObj)
 
+def process_data(travelObj):
+	# TODO: try to take input of gap time
+	query = """
+	WITH RECURSIVE all_paths(originairportid, destairportid, curpath, arr_date, arr_time) AS (
+		SELECT originairportid, destairportid, ARRAY[originairportid, destairportid], (CASE WHEN (crs_dep_time<crs_arr_time) THEN fl_date ELSE  (fl_date+INTERVAL '1 day')), crs_arr_time FROM (flights F JOIN airport_codes AC ON (F.origin=AC.airport_code AND city="Chicago"))
+		UNION
+		SELECT all_paths.originairportid, flights.destairportid, array_append(curpath, flights.destairportid), (CASE WHEN (crs_dep_time<crs_arr_time) THEN fl_date ELSE  (fl_date+INTERVAL '1 day')), crs_arr_time FROM all_paths, flights WHERE (all_paths.destairportid=flights.originairportid AND NOT (flights.destairportid = ANY(curpath)) AND (crs_dep_time<crs_arr_time OR arr_date<fl_date))
+	)
+	SELECT originairportid, destairportid, arr_date, arr_time AS length FROM (
+		all_paths AP JOIN airport_codes AC ON (AC.airport_code=AP.destairportid AND AC.city="Dallas")
+	) ORDER BY arr_date DESC, arr_time DESC LIMIT 1;
+	"""
+
 @app.route("/home")
 def home():
 	return render_template("home.html")
@@ -144,6 +158,13 @@ def get_covid_status(city):
 	status = mpq.get_covid_status(city)
 	return status
 
+@app.route("/city_name_suggestions", methods=["POST"])
+def city_name_suggestions():
+	# if request.method == "POST":
+	t = request.json
+	start_string_of_city = t["input_val"]
+	cities = home_page_queries.get_all_cities(start_string_of_city)
+	return {"arr": cities}
 
 @app.route("/profile")
 @login_required
@@ -276,6 +297,5 @@ def toys():
     return render_template('dbexample.html', toys=db.get_all_toys())
 
 if __name__ == "__main__":
-	
 	# if not first time then remove this
 	app.run(debug=True, port=5022)
