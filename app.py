@@ -132,11 +132,19 @@ def process_data(travelObj):
 	) ORDER BY arr_date DESC, arr_time DESC LIMIT 1;
 	"""
 
+@app.route("/home")
+def home():
+	return render_template("home.html")
+
 @app.route("/profile")
 @login_required
 def profile():
 	user = auth.get_user_from_userid(current_user.id)
-	return render_template('profile.html', user=user)
+	user_bookings = auth.get_user_bookings(current_user.id)
+	num_bookings = 0
+	for booking in user_bookings:
+		num_bookings += 1	
+	return render_template('profile.html', user_uname=user[1],user_email=user[2], num_bookings=num_bookings)
 
 @app.route("/<name>")
 def user(name):

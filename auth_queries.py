@@ -41,3 +41,7 @@ def get_user_from_userid(userid):
     if len(users) != 1:
         return None
     return users[0]
+
+def get_user_bookings(userid):
+    bookings = fetch(f"select * from bookings where userid='{userid}'")
+    return bookings

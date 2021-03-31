@@ -1,12 +1,54 @@
 {% extends "base.html" %}
-{% block title %}Login{% endblock %}
+{% block title %}Profile{% endblock %}
 {% block content %}
 <div class="container">
   <div class="columns">
-    <div class="column col-4"></div>
-    <div class="column col-4">
-      Welcome, {{user[1]}}!
+    <div class="column col-3"></div>
+    <div class="column col-6">
+      <ul class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">Home</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="/profile">Profile</a>
+        </li>
+      </ul>
+      <h1>Profile</h1>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="toast toast-error">
+            {{ messages[0] }}
+          </div>
+        {% endif %}
+      {% endwith %}
+      <div class="tile tile-centered">
+        <div class="tile-content">
+          <div class="tile-title text-bold">E-mail</div>
+          <div class="tile-subtitle">{{ user_email }}</div>
+        </div>
+        <div class="tile-content">
+          <div class="tile-title text-bold">Username</div>
+          <div class="tile-subtitle">{{ user_uname }}</div>
+        </div>
+        <div class="tile-action">
+          <button class="btn btn-link btn-action btn-lg tooltip tooltip-left" data-tooltip="Edit user details"><i class="icon icon-edit"></i></button>
+        </div>
+      </div>
       <br>
+      {% if num_bookings == 0 %}
+      <div class="empty">
+        <div class="empty-icon">
+          <i class="fas fa-plane-slash"></i>
+        </div>
+        <p class="empty-title h5">You haven't done any bookings yet</p>
+        <p class="empty-subtitle">Click the button below to book your first trip!</p>
+        <div class="empty-action">
+          <a href="/">
+          <button class="btn btn-primary">Start a heal trip!</button>
+          </a>
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>
