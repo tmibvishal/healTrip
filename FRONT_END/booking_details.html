@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Booking{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="columns">
+    <div class="column col-3"></div>
+    <div class="column col-6">
+      <ul class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">Home</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="/profile">Profile</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="">Booking details</a>
+          </li>
+      </ul>
+      <br>
+      <h3>Your trip from {{ dep_date }} </h3>
+      <br>
+      {% for entry in entries %}
+      {% if entry['is_hotel'] == 1 %}
+      <div class="tile tile-centered">
+        <div class="tile-icon">
+            <i class="fas fa-hotel"></i>
+        </div>
+        <div class="tile-content">
+          <div class="tile-title text-bold">{{entry['hotel_name']}}</div>
+          <div class='tile-subtitle'>{{entry['hotel_city']}}</div>
+        </div>
+        <div class="tile-action">
+            <div class='text-bold'>{{entry['stay_period']}} days stay</div>
+        </div>
+      </div>
+      {% endif %}
+      {% if entry['is_hotel'] == 0 %}
+      <div class="tile tile-centered">
+        <div class="tile-icon">
+            <i class="fas fa-plane"></i>
+        </div>
+        <div class="tile-content">
+            <ul class="step">
+                <li class="step-item">
+                    <a href="#" class="tooltip tooltip-right" data-tooltip="Departure at {{entry['dep_time']}}">{{entry['origin_code']}}, {{entry['origin_city']}}</a>
+                </li>
+                <li class="step-item">
+                    <a href="#" class="tooltip tooltip-left" data-tooltip="Arrival at {{entry['arr_time']}}">{{entry['dest_code']}}, {{entry['dest_city']}}</a>
+                </li>
+              </ul>
+        </div>
+        <div class="tile-action">
+            <div class='text-bold'>{{entry['date']}}</div>
+            <div>Carrier: {{entry['carrier']}}</div>
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}
