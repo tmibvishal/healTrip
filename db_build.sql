@@ -76,9 +76,22 @@ create table states(
     constraint state_key primary key (state_code)
 );
 
+create table covid_status(
+    state_code text,
+    deaths integer,
+    hospitalized integer,
+    inICU integer,
+    onVentilator integer,
+    positive integer,
+    recovered integer,
+    constraint covid_key primary key (state_code),
+    constraint state_ref foreign key (state_code) references states(state_code)
+);
+
 \copy airport_codes from 'data/codes.csv' delimiter ',' csv header;
 \copy flights from 'data/flights.csv' delimiter ',' csv header;
 \copy hotels from 'data/hotels.csv' delimiter ',' csv header;
 \copy reviews from 'data/reviews.csv' delimiter ',' csv header;
 \copy states from 'data/states.csv' delimiter ',' csv header;
+\copy covid_status from 'data/covid_status.csv' delimiter ',' csv header;
 

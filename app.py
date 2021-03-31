@@ -138,6 +138,11 @@ def get_cities(input):
 	cities = mpq.get_all_cities(input)
 	return cities
 
+# complete this method to render the covid status
+def get_covid_status(city):
+	status = mpq.get_covid_status(city)
+	return status
+
 
 @app.route("/profile")
 @login_required

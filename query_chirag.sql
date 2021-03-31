@@ -1,10 +1,12 @@
 -- select cities starting with something --
+/*
 select ac.city
 from airport_codes as ac
 where ac.city like 'A%'
 group by ac.city;
 
 create index city_index on airport_codes(city);
+*/
 
 
 
@@ -36,4 +38,10 @@ group by rc.flight_ids , rc.cost
 order by cost asc
 limit 3;
 */
+
+-- get the covid data of a city --
+select cs.state_code , cs.deaths , cs.hospitalized , cs.inICU , cs.onVentilator , cs.positive , cs.recovered
+from covid_status as cs , airport_codes as ac
+where ac.city = 'Given city'
+and ac.state_code = cs.state_code;
 
