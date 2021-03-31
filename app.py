@@ -5,7 +5,6 @@ from datetime import date, datetime
 from flask import Flask, redirect, url_for, render_template, request, json
 import db
 import auth_queries as auth
-import mainpage_queries as mpq
 import profile_queries as prof
 import home_page_queries
 
@@ -107,10 +106,31 @@ def logout():
 def index():
 	return render_template("index.html")
 
-@app.route("/order_cities")
+def is_valid_travel_object(travelObject):
+	if isinstance(travelObject, dict):
+		if "sourceCity" in travelObject and isinstance(travelObject["sourceCity"], str):
+			# TODO: make departure date as date
+			if "departureDate" in travelObject and isinstance(travelObject["departureDate"], str):
+				if "roundTrip" in travelObject and isinstance(travelObject["roundTrip"], bool):
+					if "chooseBestOrdering" in travelObject and isinstance(travelObject["chooseBestOrdering"], bool):
+						if "citiesToVisit" in travelObject and isinstance(travelObject["citiesToVisit"], list) and len(travelObject["citiesToVisit"]) > 0:
+							for obj in travelObject["citiesToVisit"]:
+								if (isinstance(obj, dict)):
+									if "cityName" in obj and isinstance(obj["cityName"], str):
+										if "stayPeriod" in obj and isinstance(obj["stayPeriod"], int):
+											return True
+	return False
+
+@app.route("/order_cities", methods=["GET", "POST"])
 def order_cities():
-	travelObj = {"sourceCity": "Seattle", "departureDate": date.today()}
-	return render_template("order_cities.html", travelObj=travelObj)
+	if request.method == "POST":
+		t = request.form.get('json')
+		travelObj = json.loads(t)
+		if is_valid_travel_object(travelObj):
+			return render_template("order_cities.html", travelObj=travelObj)
+		else:
+			return render_template("order_cities.html", travelObj=None)
+	return render_template("order_cities.html", travelObj=None)
 
 @app.route("/output_page", methods=["GET", "POST"])
 def output_page():
@@ -143,19 +163,19 @@ def home():
 # check these methods for autocomplete
 @app.route("/home" , methods=["GET"])
 def init_autocomplete():
-	mpq.init_autocomplete()
+	home_page_queries.init_autocomplete()
 	initialise_autocomplete = True
 	#complete rest
 
 def get_cities(input):
 	if not initialise_autocomplete:
 		init_autocomplete()
-	cities = mpq.get_all_cities(input)
+	cities = home_page_queries.get_all_cities(input)
 	return cities
 
 # complete this method to render the covid status
 def get_covid_status(city):
-	status = mpq.get_covid_status(city)
+	status = home_page_queries.get_covid_status(city)
 	return status
 
 @app.route("/city_name_suggestions", methods=["POST"])

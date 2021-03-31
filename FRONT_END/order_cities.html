@@ -22,6 +22,12 @@
       <blockquote>
         Order the cities in a order you want to visit them and add stay period in number of days
       </blockquote>
+
+      {% if travelObj == None %}
+        Looks like you didn't visit this page from home page. Or maybe you passed some wrong value from home page.
+        <br>
+        Go back to the <a href="url_for('home')">home page</a> and then visit this page.
+      {% else %}
       <div class="card shadowContainer">
         <div class="card-header">
           <span class="label label-rounded mr-1">Source City: {{ travelObj["sourceCity"] }}</span>
@@ -36,19 +42,12 @@
               </tr>
             </thead>
             <tbody>
-              
-              <tr class="selectableTr">
-                <td>New York</td>
-                <td><input class="form-input input-sm" type="number" placeholder="days" value="1"></td>
-              </tr>
-              <tr class="selectableTr">
-                <td>Washington</td>
-                <td><input class="form-input input-sm" type="number" placeholder="days" value="2"></td>
-              </tr>
-              <tr class="selectableTr">
-                <td>Palo Alto</td>
-                <td><input class="form-input input-sm" type="number" placeholder="days" value="3"></td>
-              </tr>
+              {% for ele in travelObj["citiesToVisit"] %}
+                <tr class="selectableTr">
+                  <td>{{ ele["cityName"] }}</td>
+                  <td><input class="form-input input-sm" type="number" placeholder="days" value="1"></td>
+                </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
@@ -63,6 +62,10 @@
       <button class="btn btn-primary btn-lg" onclick="sendRequest(0)">Visit Cities in Order Given</button>
       <button class="btn btn-primary btn-lg" onclick="sendRequest(1)">Choose Best Order</button>
       <br>
+      {% endif %}
+
+
+
     </div>
     <div class="column col-3 col-lg-2 col-xs-0"></div>
   </div>
@@ -108,16 +111,19 @@
     }
   }
 
-  
-  
+
+
   function sendRequest(chooseBestOrdering) {
     let arr = []
     let rows = document.getElementById("table").rows;
     for (var i = 1; i < table.rows.length; i++) {
       let cityName = rows[i].children[0].innerText
       let stayPeriod = Number(rows[i].children[1].firstElementChild.value)
-      arr.push({"cityName": cityName, "stayPeriod": stayPeriod})
-    } 
+      arr.push({
+        "cityName": cityName,
+        "stayPeriod": stayPeriod
+      })
+    }
 
     let travelObj = {
       "sourceCity": "New york",
@@ -126,7 +132,9 @@
       "citiesToVisit": arr
     }
 
-    post("/output_page", {"json": JSON.stringify(travelObj)});
+    post("/output_page", {
+      "json": JSON.stringify(travelObj)
+    });
 
     // ajax does not redirect
     // $.ajax({

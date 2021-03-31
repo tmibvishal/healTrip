@@ -237,22 +237,24 @@
       //console.log(dep_date);
 
       let arr = []
-      let rows = document.getElementById("citytable").rows;
-      for (var i = 0; i < rows.length; i++) {
+      let table = document.getElementById("citytable");
+      for (var i = 0; i < table.children.length; i++) {
         var cityName = document.getElementById("cities" + i.toString()).value;
         //var cityName = rows.item(i).cells.item(0).value;
-        arr.push(cityName);
+        arr.push({"cityName": cityName, "stayPeriod": 1}); // stayPeriod will be ignored and will be taken as input in order cities page again
       }
 
       var round_trip = document.getElementById("round_trip").checked;
 
       let travelObj = {
         "sourceCity": src_city,
-        "departureDate": dep_date,
+        "departureDate": new Date(dep_date),
         "citiesToVisit": arr,
-        "roundTrip": round_trip
-      }
-      //post("/order_cities", {"json": JSON.stringify(travelObj)});
+        "roundTrip": round_trip,
+        "chooseBestOrdering": false 
+      } // chooseBestOrdering will be ignored in order cities page and will be taken as input in order cities page itself
+
+      post("/order_cities", {"json": JSON.stringify(travelObj)});
     }
   }
 
