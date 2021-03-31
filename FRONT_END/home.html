@@ -27,7 +27,7 @@
         <div class="card-body">
           <div class="form-group">
             <label class="form-label" for="input-example-1">From</label>
-            <form autocomplete="off" id="citytable" class="form-group">
+            <form autocomplete="off" class="form-group">
               <div class="autocomplete form-group">
                 <input class="form-input input-sm" id="From" type="text">
               </div>
@@ -154,7 +154,7 @@
             /*execute a function when someone clicks on the item value (DIV element):*/
             b.addEventListener("click", function (e) {
               /*insert the value for the autocomplete text field:*/
-              inp.value = input_text_box.getElementsByTagName("input")[0].value;
+              input_text_box.value = this.getElementsByTagName("input")[0].value;
               /*close the list of autocompleted values,
               (or any other open lists of autocompleted values:*/
               closeAllLists();
