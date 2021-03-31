@@ -168,6 +168,58 @@ def profile():
 		})	
 	return render_template('profile.html', user_uname=user[1],user_email=user[2], num_bookings=num_bookings, bookings = bookings_data)
 
+@app.route('/edit_profile')
+@login_required
+def edit_profile():
+	user = auth.get_user_from_userid(current_user.id)
+	return render_template('edit_profile.html', uname=user[1], email=user[2])
+
+@app.route('/edit_profile', methods=['POST'])
+@login_required
+def edit_profile_post():
+	uname = request.form.get('uname')
+	email = request.form.get('email')
+
+	user = auth.get_user_from_uname(uname)
+	if user and user[0] != current_user.id:
+		flash('Username already taken')
+		return redirect(url_for('edit_profile'))
+	user = auth.get_user_from_email(email)
+	if user and user[0] != current_user.id:
+		flash('Another account with this email already exists')
+		return redirect(url_for('edit_profile'))
+	
+	auth.update_user_details(current_user.id, uname, email)
+	flash('Details updated')
+	return redirect(url_for('profile'))
+
+@app.route('/change_password', methods=['POST'])
+@login_required
+def change_password():
+	old_password = request.form.get('old_password')
+	new_password = request.form.get('new_password')
+
+	user = auth.get_user_from_userid(current_user.id)
+	if not check_password_hash(user[3], old_password):
+		flash('Old password is incorrect')
+		return redirect(url_for('edit_profile'))
+	if len(new_password)==0:
+		flash('Password cannot be empty')
+		return redirect(url_for('edit_profile'))
+	
+	auth.update_password(current_user.id, generate_password_hash(new_password))
+	flash('Password updated')
+	return redirect(url_for('profile')) 
+
+@app.route('/delete_user')
+@login_required
+def delete_user():
+	id = current_user.id
+	logout_user()
+	auth.delete_user(id)
+	flash('User deleted')
+	return redirect(url_for('login'))
+
 @app.route('/booking_details/<booking_id>')
 @login_required
 def booking_details(booking_id):
