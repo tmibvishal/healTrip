@@ -123,7 +123,8 @@ def output_page():
 @login_required
 def profile():
 	user = auth.get_user_from_userid(current_user.id)
-	return render_template('profile.html', user=user)
+	user_bookings = auth.get_user_bookings(current_user.id)
+	return render_template('profile.html', user_uname=user[1],user_email=user[2], num_bookings=0)
 
 @app.route("/<name>")
 def user(name):
