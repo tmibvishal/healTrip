@@ -12,18 +12,20 @@ create table bookings(
     userid integer,
     source_airport_code text,
     departure_date Date,
+    constraint id_key primary key (id) ,
     constraint source_ref foreign key (source_airport_code) references airport_codes(airport_code),
     constraint user_ref foreign key (userid) references users(userid)
 );
 
-create table booking_entry{
+create table booking_entry(
     id serial,
     booking_id integer, -- id of booking
     is_hotel boolean, -- 0 for flight, 1 for hotel
     entry_id integer, -- flight id or hotel id
     stay_period integer, -- null for flight, no of days for hotel
+    constraint bid_key primary key (id) ,
     constraint booking_ref foreign key (booking_id) references bookings(id)
-};
+);
 
 create table airport_codes(
     city text ,
