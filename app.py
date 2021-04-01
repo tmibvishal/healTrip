@@ -7,6 +7,7 @@ import db
 import auth_queries as auth
 import profile_queries as prof
 import home_page_queries
+import booking_queries as book
 
 app = Flask(__name__, static_url_path='/FRONT_END/src', static_folder='FRONT_END/src', template_folder='FRONT_END')
 app.config['SECRET_KEY'] = 'we are the champions'
@@ -152,17 +153,127 @@ def order_cities():
 			return render_template("order_cities.html", travelObj=None)
 	return render_template("order_cities.html", travelObj=None)
 
-@app.route("/output_page", methods=["GET", "POST"])
+def get_entries(travelObj, selections):
+	entries = []
+	k = 0
+	for i in range(len(travelObj['flight_paths'])):
+		options = travelObj['flight_paths'][i]
+		flight_ids = options[selections[k]]
+		k += 1
+		flights = []
+		for flight_id in flight_ids:
+			flight = prof.get_flight(flight_id)
+			origin_airport = prof.get_airport_data(flight[3])[0]
+			dest_airport = prof.get_airport_data(flight[4])[0]
+			flights.append({
+				'is_hotel':False,
+				'origin_code':origin_airport[2],
+				'origin_city':origin_airport[0],
+				'dest_code':dest_airport[2],
+				'dest_city':dest_airport[0],
+				'dep_time':str(flight[5])[:-2] + ':' + str(flight[5])[-2:],
+				'arr_time':str(flight[6])[:-2] + ':' + str(flight[6])[-2:],
+				'date':str(flight[1]),
+				'carrier':flight[2]
+			})
+		entries.append({
+			'entry_num': k,
+			'is_hotel':False,
+			'flights':flights,
+		})
+
+		if i==len(travelObj['hotels']):
+			break 
+
+		options = travelObj['hotels'][i]
+		hotel_id = options[selections[k]]
+		k += 1
+		hotel = prof.get_hotel(hotel_id)
+		entries.append({
+			'entry_num': k,
+			'is_hotel': True,
+			'hotel_name':hotel[3],
+			'hotel_city':hotel[1],
+			'stay_period': travelObj['citiesToVisit'][i]['stayPeriod']
+		})
+	return entries
+
+
+@app.route("/output_page", methods=["POST"])
 def output_page():
-	if request.method == "POST":
-		print("hello")
-		t = request.form.get('json')
-		travelObj = json.loads(t)
+	t = request.form.get('json')
+	travelObj = json.loads(t)
+	
+	if not 'selections' in travelObj:
 		travelObj = handle_request(travelObj)
 		print(travelObj)
-		return render_template("output_page.html", travelObj=travelObj)
-	travelObj = {"sourceCity": "YoYo", "departureDate": date.today()}
-	return render_template("output_page.html", travelObj=travelObj)	
+
+	if not travelObj:
+		return render_template('output_page.html', plan_found=False)
+	
+	if not 'selections' in travelObj:
+		selections = [0 for i in range(len(travelObj['flight_paths']) + len(travelObj['hotels']))]
+		travelObj['selections'] = selections
+
+	entries = get_entries(travelObj, travelObj['selections'])
+	
+	return render_template("output_page.html", plan_found=True, travelObj=travelObj, entries=entries)
+
+@app.route('/view_options', methods=['POST'])
+def view_options():
+	t = request.form.get('travelObj')
+	entry_num = int(request.form.get('entry_num'))
+	if (not t) or (not entry_num):
+		render_template('404.html')
+	
+	travelObj = json.loads(t)
+	print(travelObj)
+	print(travelObj['flight_paths'])
+
+	entries = []
+
+	if entry_num % 2 == 1: # flight
+		options = travelObj['flight_paths'][entry_num//2]
+		for i, flight_ids in enumerate(options):
+			flights = []
+			for flight_id in flight_ids:
+				flight = prof.get_flight(flight_id)
+				origin_airport = prof.get_airport_data(flight[3])[0]
+				dest_airport = prof.get_airport_data(flight[4])[0]
+				flights.append({
+					'is_hotel':False,
+					'origin_code':origin_airport[2],
+					'origin_city':origin_airport[0],
+					'dest_code':dest_airport[2],
+					'dest_city':dest_airport[0],
+					'dep_time':str(flight[5])[:-2] + ':' + str(flight[5])[-2:],
+					'arr_time':str(flight[6])[:-2] + ':' + str(flight[6])[-2:],
+					'date':str(flight[1]),
+					'carrier':flight[2]
+				})
+			entries.append({
+				'option_no': i,
+				'is_hotel':False,
+				'flights':flights,
+			})
+	else: # hotel
+		options = travelObj['hotels'][entry_num//2 -1]
+		for i, hotel_id in enumerate(options):
+			hotel = prof.get_hotel(hotel_id)
+			entries.append({
+				'option_no': i,
+				'is_hotel': True,
+				'hotel_id':hotel_id,
+				'hotel_name':hotel[3],
+				'hotel_city':hotel[1],
+				'stay_period': travelObj['citiesToVisit'][entry_num//2 - 1]['stayPeriod']
+			})
+
+	travelObj['entry_num'] = entry_num
+	travelObj['num_options'] = len(entries)
+	return render_template('view_options.html', travelObj=travelObj, entries=entries)
+
+
 
 @app.route("/home")
 def home():
@@ -297,7 +408,7 @@ def booking_details(booking_id):
 			})
 	return render_template('booking_details.html', entries=entries, dep_date=dep_date)
 
-@app.route('/hotel/<hotel_id>')
+@app.route('/hotel/<hotel_id>', methods=['GET','POST'])
 def hotel_page(hotel_id):
 	hotel = prof.get_hotel(hotel_id)
 	if not hotel:
@@ -318,7 +429,46 @@ def hotel_page(hotel_id):
 	if not hotel_state:
 		return render_template('404.html')
 
-	return render_template('hotel.html', hotel=hotel, reviews=reviews, avg_rating=avg_rating, hotel_state=hotel_state)
+	if request.method=='POST':
+		t = request.form.get('json')
+		travelObj = json.loads(t)
+		return render_template('hotel.html', preview=True, travelObj=travelObj, hotel=hotel, reviews=reviews, avg_rating=avg_rating, hotel_state=hotel_state)
+
+	return render_template('hotel.html', preview=False, hotel=hotel, reviews=reviews, avg_rating=avg_rating, hotel_state=hotel_state)
+
+@app.route('/book_trip', methods=['POST'])
+@login_required
+def book_trip():
+	t = request.form.get('json')
+	travelObj = json.loads(t)
+
+	selections = travelObj['selections']
+	first_flight_id = travelObj['flight_paths'][0][selections[0]][0]
+
+	first_flight = prof.get_flight(first_flight_id)
+	
+	source_airport_code = first_flight[3]
+	user_id = current_user.id
+	departure_date = travelObj['departureDate']
+
+	book.add_booking(source_airport_code, user_id, departure_date)
+	booking_id = book.get_last_booking_id(user_id)
+
+	hotel_i, flight_i = 0, 0
+	for k in range(len(selections)):
+		if k % 2 == 0: # flight
+			flight_ids = travelObj['flight_paths'][flight_i][selections[k]]
+			for flight_id in flight_ids:
+				book.add_flight_entry(booking_id, flight_id)
+			flight_i += 1
+		else:
+			hotel_id = travelObj['hotels'][hotel_i][selections[k]]
+			stay_period = travelObj['citiesToVisit'][hotel_i]['stayPeriod']
+			book.add_hotel_entry(booking_id, hotel_id, stay_period)
+			hotel_i += 1
+
+	return redirect(url_for('profile'))
+
 
 @app.route("/<name>")
 def user(name):

@@ -20,13 +20,9 @@
                     <a class="tooltip" data-tooltip="Choose hotels and finalize">Choose Flights & Hotels</a>
                 </li>
             </ul>
-            {% if plan_found %}
             <blockquote>
-                Here's our proposed travel plan for your trip. You can view more options for hotels and flights and
-                choose the one that best suits you!
+               Here are other options. Select the best that suits you!
             </blockquote>
-            <span class="label label-rounded mr-1">Source City: {{ travelObj["sourceCity"] }}</span>
-            <span class="label label-rounded mr-1">Departure Date: {{ travelObj["departureDate"] }}</span>
             <div class="divider"></div>
             {% for entry in entries %}
             {% if entry['is_hotel'] == 1 %}
@@ -44,7 +40,8 @@
                             <div>{{entry['stay_period']}} days stay</div>
                         </div>
                         <div class="tile-action">
-                            <button class='btn' id='entry-{{entry['entry_num']}}'>View options</button>
+                            <button class='btn' id='option-{{entry['option_no']}}'>Select</button>
+                            <button class='btn' onClick="preview_hotel({{entry['hotel_id']}})">View details</button>
                         </div>
                     </div>
                 </div>
@@ -79,7 +76,7 @@
                             {% endfor %}
                         </div>
                         <div class="tile-action">
-                            <button class='btn' id='entry-{{entry['entry_num']}}'>View options</button>
+                            <button class='btn' id='option-{{entry['option_no']}}'>Select</button>
                         </div>
                     </div>
                 </div>
@@ -87,24 +84,8 @@
             <br>
             {% endif %}
             {% endfor %}
+            <button id='final_submit' class='btn btn-primary'>Choose this!</button>
             <br>
-            <button class="btn btn-primary btn-lg" id="book_final">Book the flights and hotels</button>
-            <br>
-            {% endif %}
-            {% if not plan_found %}
-            <div class="empty">
-                <div class="empty-icon">
-                    <i class="fas fa-plane-slash"></i>
-                </div>
-                <p class="empty-title h5">We couldn't find a valid travel plan!</p>
-                <p class="empty-subtitle">Please consider tweaking your plan</p>
-                <div class="empty-action">
-                    <a href="/">
-                        <button class="btn btn-primary" >Back to home</button>
-                    </a>
-                </div>
-            </div>
-            {% endif %}
         </div>
         <div class="column col-3 col-lg-2 col-xs-0"></div>
     </div>
@@ -112,21 +93,36 @@
 <script>
     let travelObj = {{ travelObj|tojson }};
 
-    for(let i=1;i<=travelObj.selections.length;++i)
+    let current_selection = travelObj.selections[travelObj.entry_num-1];
+    document.getElementById('option-'+current_selection.toString()).classList.toggle('btn-primary')
+    document.getElementById('option-'+current_selection.toString()).innerHTML='<i class="fas fa-check"></i>Selected'
+
+    for(let i=0;i<travelObj.num_options;++i)
     {
-        document.getElementById('entry-'+i.toString()).onclick = () => {
-            post("/view_options", {
-                'travelObj':JSON.stringify(travelObj),
-                'entry_num':i
-            });
+        document.getElementById('option-'+i.toString()).onclick = () => {
+
+            document.getElementById('option-'+current_selection.toString()).classList.toggle('btn-primary')
+            document.getElementById('option-'+current_selection.toString()).innerHTML='Select'
+
+            current_selection = i;
+            travelObj.selections[travelObj.entry_num-1] = current_selection;
+
+            document.getElementById('option-'+current_selection.toString()).classList.toggle('btn-primary')
+            document.getElementById('option-'+current_selection.toString()).innerHTML='<i class="fas fa-check"></i>Selected'
         }
     }
 
-    document.getElementById('book_final').onclick = () => {
-        post('/book_trip', {
-            'json':JSON.stringify(travelObj)
-        })
+    document.getElementById('final_submit').onclick = () => {
+            post("/output_page", {
+                'json':JSON.stringify(travelObj),
+            });
     }
-    
+
+    function preview_hotel(hotel_id){
+        post("/hotel/"+hotel_id.toString(), {
+            'json':JSON.stringify(travelObj),
+        });
+    }
+
 </script>
 {% endblock %}
