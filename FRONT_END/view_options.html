@@ -83,6 +83,7 @@
             <br>
             {% endif %}
             {% endfor %}
+            <button id='final_submit' class='btn btn-primary'>Choose this!</button>
             <br>
         </div>
         <div class="column col-3 col-lg-2 col-xs-0"></div>
@@ -91,14 +92,30 @@
 <script>
     let travelObj = {{ travelObj|tojson }};
 
+    let current_selection = travelObj.selections[travelObj.entry_num-1];
+    document.getElementById('option-'+current_selection.toString()).classList.toggle('btn-primary')
+    document.getElementById('option-'+current_selection.toString()).innerHTML='<i class="fas fa-check"></i>Selected'
+
     for(let i=0;i<travelObj.num_options;++i)
     {
         document.getElementById('option-'+i.toString()).onclick = () => {
-            travelObj.selections[travelObj.entry_num-1] = i;
+
+            document.getElementById('option-'+current_selection.toString()).classList.toggle('btn-primary')
+            document.getElementById('option-'+current_selection.toString()).innerHTML='Select'
+
+            current_selection = i;
+
+            document.getElementById('option-'+current_selection.toString()).classList.toggle('btn-primary')
+            document.getElementById('option-'+current_selection.toString()).innerHTML='<i class="fas fa-check"></i>Selected'
+        }
+    }
+
+    document.getElementById('final_submit').onclick = () => {
+        travelObj.selections[travelObj.entry_num-1] = current_selection;
             post("/output_page", {
                 'json':JSON.stringify(travelObj),
             });
-        }
-    }
+    } 
+
 </script>
 {% endblock %}
