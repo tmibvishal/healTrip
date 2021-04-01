@@ -121,6 +121,23 @@ def is_valid_travel_object(travelObject):
 											return True
 	return False
 
+def handle_request(travelObj):
+	#if is_valid_travel_object(travelObj):
+	if travelObj["chooseBestOrdering"]:
+		return None
+	else:
+		if travelObj["roundTrip"]:
+			return home_page_queries.round_trip_simple(travelObj)
+		else:
+			print("checking no round trip")
+			return home_page_queries.no_round_trip_simple(travelObj)
+
+	"""
+	else:
+		print("not valid")
+		return None
+	"""
+
 @app.route("/order_cities", methods=["GET", "POST"])
 def order_cities():
 	if request.method == "POST":
@@ -138,24 +155,11 @@ def output_page():
 		print("hello")
 		t = request.form.get('json')
 		travelObj = json.loads(t)
+		travelObj = handle_request(travelObj)
 		print(travelObj)
 		return render_template("output_page.html", travelObj=travelObj)
 	travelObj = {"sourceCity": "YoYo", "departureDate": date.today()}
-	return render_template("output_page.html", travelObj=travelObj)
-
-def handle_request(travelObj):
-	if is_valid_travel_object(travelObj):
-		if travelObj["chooseBestOrdering"]:
-			return None
-		else:
-			if travelObj["round_trip"]:
-				return home_page_queries.round_trip_simple(travelObj)
-			else:
-				return home_page_queries.no_round_trip_simple(travelObj)
-
-	else:
-		return None
-	
+	return render_template("output_page.html", travelObj=travelObj)	
 
 @app.route("/home")
 def home():

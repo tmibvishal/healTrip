@@ -17,15 +17,15 @@ def get_covid_status(city):
     from covid_status as cs , airport_codes as ac
     where ac.city = %s
     and ac.state_code = cs.state_code;"""
-    city_pattern = '{}%'.format(city)
+    city_pattern = '{}'.format(city)
     status = db.fetch(query, (city_pattern, ))
     return status
 
 def check_direct_connection(city1,city2):
     query = """select * from direct_con where city1 = %s and city2 = %s;"""
 
-    city_pattern1 = '{}%'.format(city1)
-    city_pattern2 = '{}%'.format(city2)
+    city_pattern1 = '{}'.format(city1)
+    city_pattern2 = '{}'.format(city2)
 
     is_direct = db.fetch(query , (city_pattern1 , city_pattern2, ))
 
@@ -42,13 +42,17 @@ def get_direct_connection(city1,city2,dep_date):
     and fl.fl_date = %s
     limit 3; """
 
-    city_pattern1 = '{}%'.format(city1)
-    city_pattern2 = '{}%'.format(city2)
-    date_pattern = '{}%'.format(dep_date)
+    city_pattern1 = '{}'.format(city1)
+    city_pattern2 = '{}'.format(city2)
+    date_pattern = '{}'.format(dep_date)
 
     direct_con = db.fetch(query , (city_pattern1 , city_pattern2, date_pattern, ))
 
-    return direct_con
+    temp_conn = []
+    for c in direct_con:
+        temp_conn.append(c[0])
+
+    return temp_conn
 
 def get_connecting_flights(city1,city2,dep_date):
     query = """select rc.flight_ids
@@ -75,13 +79,17 @@ def get_connecting_flights(city1,city2,dep_date):
     order by cost asc
     limit 3;"""
 
-    city_pattern1 = '{}%'.format(city1)
-    city_pattern2 = '{}%'.format(city2)
-    date_pattern = '{}%'.format(dep_date)
+    city_pattern1 = '{}'.format(city1)
+    city_pattern2 = '{}'.format(city2)
+    date_pattern = '{}'.format(dep_date)
 
     conn = db.fetch(query , (city_pattern1 , date_pattern , city_pattern1 , city_pattern2 , date_pattern , city_pattern1 , city_pattern2 , ))
 
-    return conn
+    temp_conn = []
+    for c in conn:
+        temp_conn.append(c[0])
+
+    return temp_conn
 
 def get_best_hotel(city):
     query = """ select hotels.hotel_id
@@ -92,16 +100,22 @@ def get_best_hotel(city):
     order by rating desc
     limit 3; """
 
-    city_pattern = '{}%'.format(city)
+    city_pattern = '{}'.format(city)
     hotels = db.fetch(query, (city_pattern, ))
 
-    return hotels
+    temp_hotels = []
+    for h in hotels:
+        temp_hotels.append(h[0])
+
+    return temp_hotels
 
 
 def no_round_trip_simple(travelObj):
     src_city = travelObj["sourceCity"]
-    dep_date = travelObj["departureDate"]
+    dep_date_text = travelObj["departureDate"]
     cities_to_visit = travelObj["citiesToVisit"]
+
+    dep_date = datetime.datetime(int(dep_date_text[:4]),int(dep_date_text[5:7]),int(dep_date_text[8:10]))
 
     flight_paths = []
     hotels = []
@@ -109,6 +123,8 @@ def no_round_trip_simple(travelObj):
     for city in cities_to_visit:
         city_name = city["cityName"]
         hotels.append(get_best_hotel(city_name))
+
+        """
 
         if check_direct_connection(src_city , city_name):
             flight_path_temp = get_direct_connection(src_city,city_name,dep_date)
@@ -119,7 +135,8 @@ def no_round_trip_simple(travelObj):
             flight_paths.append(flight_path_temp)
 
         else:
-            flight_paths.append(get_connecting_flights(src_city,city_name,dep_date))
+        """
+        flight_paths.append(get_connecting_flights(src_city,city_name,dep_date))
 
         src_city = city_name
 
@@ -133,8 +150,12 @@ def no_round_trip_simple(travelObj):
 
 def round_trip_simple(travelObj):
     src_city = travelObj["sourceCity"]
-    dep_date = travelObj["departureDate"]
+    dep_date_text = travelObj["departureDate"]
     cities_to_visit = travelObj["citiesToVisit"]
+
+    dep_date = datetime.datetime(int(dep_date_text[:4]),int(dep_date_text[5:7]),int(dep_date_text[8:10]))
+
+    temp_city_name = src_city
 
     flight_paths = []
     hotels = []
@@ -143,16 +164,7 @@ def round_trip_simple(travelObj):
         city_name = city["cityName"]
         hotels.append(get_best_hotel(city_name))
 
-        if check_direct_connection(src_city , city_name):
-            flight_path_temp = get_direct_connection(src_city,city_name,dep_date)
-
-            if len(flight_path_temp) == 0:
-                flight_path_temp = get_connecting_flights(src_city,city_name,dep_date)
-
-            flight_paths.append(flight_path_temp)
-
-        else:
-            flight_paths.append(get_connecting_flights(src_city,city_name,dep_date))
+        flight_paths.append(get_connecting_flights(src_city,city_name,dep_date))
 
         src_city = city_name
 
@@ -160,17 +172,7 @@ def round_trip_simple(travelObj):
         dep_date = dep_date + time_change
 
     # to complete round trip
-    if check_direct_connection(src_city , city_name):
-        flight_path_temp = get_direct_connection(src_city,city_name,dep_date)
-
-        if len(flight_path_temp) == 0:
-            flight_path_temp = get_connecting_flights(src_city,city_name,dep_date)
-
-        flight_paths.append(flight_path_temp)
-
-    else:
-        flight_paths.append(get_connecting_flights(src_city,city_name,dep_date))
-
+    flight_paths.append(get_connecting_flights(src_city,temp_city_name,dep_date))
 
     travelObj["flight_paths"] = flight_paths
     travelObj["hotels"] = hotels
