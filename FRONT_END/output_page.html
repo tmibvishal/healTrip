@@ -1,14 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Finalise the trabel plan{% endblock %}
+{% block title %}Finalise the travel plan{% endblock %}
 {% block content %}
 <div class="container customContainer">
     <div class="columns">
         <div class="column col-3 col-lg-2 col-xs-0"></div>
         <div class="column col-6 col-lg-8 col-xs-12">
-            <h4><i class="fa fa-bed"></i>Your travel plan with hotels in different cities</h4>
+            <h4><i class="fa fa-bed"></i>Your travel plan</h4>
             <ul class="step">
                 <li class="step-item">
-                    <a href="{{ url_for('home') }}" class="tooltip" data-tooltip="Choose from and vacation destination cities">Choose from and to</a>
+                    <a href="{{ url_for('home') }}" class="tooltip"
+                        data-tooltip="Choose from and vacation destination cities">Choose from and to</a>
                 </li>
                 <li class="step-item">
                     <a class="tooltip"
@@ -16,46 +17,109 @@
                         Cities</a>
                 </li>
                 <li class="step-item active">
-                    <a class="tooltip" data-tooltip="Choose hotels and finalize">Choose Hotels</a>
+                    <a class="tooltip" data-tooltip="Choose hotels and finalize">Choose Flights & Hotels</a>
                 </li>
             </ul>
+            {% if plan_found %}
             <blockquote>
-                Choose hotels and finalize. You can check ratings and reviews of different hotels and also choose the
-                best hotel for you in different cities.
+                Here's our proposed travel plan for your trip. You can view more options for hotels and flights and
+                choose the one that best suits you!
             </blockquote>
+            <span class="label label-rounded mr-1">Source City: {{ travelObj["sourceCity"] }}</span>
+            <span class="label label-rounded mr-1">Departure Date: {{ travelObj["departureDate"] }}</span>
+            <div class="divider"></div>
+            {% for entry in entries %}
+            {% if entry['is_hotel'] == 1 %}
             <div class="card shadowContainer">
                 <div class="card-header">
-                    <span class="label label-rounded mr-1">Source City: {{ travelObj["sourceCity"] }}</span>
-                    <span class="label label-rounded mr-1">Departure Date: {{ travelObj["departureDate"] }}</span>
                 </div>
                 <div class="card-body">
-                    <table class="table" id="table">
-                        <thead>
-                            <tr class="selectableTr">
-                                <th>City</th>
-                                <th>Flight Path</th>
-                                <th>Stay Period (in no. of days)</th>
-                                <th>Hotel</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for ele in travelObj["citiesToVisit"] %}
-                            <tr class="selectableTr">
-                                <td>{{ ele["cityName"] }}</td>
-                                <td>Flight Path</td>
-                                <td>{{ ele["stayPeriod"] }}</td>
-                                <td>Hotel</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <div class="tile tile-centered">
+                        <div class="tile-icon">
+                            <i class="fas fa-hotel"></i>
+                        </div>
+                        <div class="tile-content">
+                            <div class="text-bold">{{entry['hotel_name']}}</div>
+                            <div class='tile-subtitle'>{{entry['hotel_city']}}</div>
+                            <div>{{entry['stay_period']}} days stay</div>
+                        </div>
+                        <div class="tile-action">
+                            <button class='btn'>View options</button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <br>
+            {% endif %}
+            {% if entry['is_hotel'] == 0 %}
+            <div class="card shadowContainer">
+                <div class="card-header">
+                </div>
+                <div class="card-body">
+                    <div class="tile tile-centered">
+                        <div class="tile-icon">
+                            <i class="fas fa-plane"></i>
+                        </div>
+                        <div class="tile-content">
+                            {% for flight in entry['flights'] %}
+                            <div class='text-bold'>Carrier: {{flight['carrier']}}</div>
+                            <div>{{flight['date']}}</div>
+                            <ul class="step">
+                                <li class="step-item">
+                                    <a href="#" class="tooltip tooltip-right"
+                                        data-tooltip="Departure at {{flight['dep_time']}}">{{flight['origin_code']}},
+                                        {{flight['origin_city']}}</a>
+                                </li>
+                                <li class="step-item">
+                                    <a href="#" class="tooltip tooltip-left"
+                                        data-tooltip="Arrival at {{flight['arr_time']}}">{{flight['dest_code']}},
+                                        {{flight['dest_city']}}</a>
+                                </li>
+                            </ul>
+                            {% endfor %}
+                        </div>
+                        <div class="tile-action">
+                            <button class='btn' id='entry-{{entry['entry_num']}}'>View options</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            {% endif %}
+            {% endfor %}
+            <br>
             <button class="btn btn-primary btn-lg" onclick="sendRequest(0)">Book the flights and hotels</button>
             <br>
+            {% endif %}
+            {% if not plan_found %}
+            <div class="empty">
+                <div class="empty-icon">
+                    <i class="fas fa-plane-slash"></i>
+                </div>
+                <p class="empty-title h5">We couldn't find a valid travel plan!</p>
+                <p class="empty-subtitle">Please consider tweaking your plan</p>
+                <div class="empty-action">
+                    <a href="/">
+                        <button class="btn btn-primary">Back to home</button>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
         </div>
         <div class="column col-3 col-lg-2 col-xs-0"></div>
     </div>
 </div>
+<script>
+    let travelObj = {{ travelObj|tojson }};
+
+    for(let i=1;i<=travelObj.selections.length;++i)
+    {
+        document.getElementById('entry-'+i.toString()).onclick = () => {
+            post("/view_options", {
+                'travelObj':travelObj,
+                'entry_num':i
+            });
+        }
+    }
+</script>
 {% endblock %}

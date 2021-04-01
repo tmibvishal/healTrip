@@ -149,17 +149,68 @@ def order_cities():
 			return render_template("order_cities.html", travelObj=None)
 	return render_template("order_cities.html", travelObj=None)
 
-@app.route("/output_page", methods=["GET", "POST"])
+def get_entries(travelObj, selections):
+	entries = []
+	k = 0
+	for i in range(len(travelObj['flight_paths'])):
+		options = travelObj['flight_paths'][i]
+		flight_ids = options[selections[k]]
+		k += 1
+		flights = []
+		for flight_id in flight_ids:
+			flight = prof.get_flight(flight_id)
+			origin_airport = prof.get_airport_data(flight[3])[0]
+			dest_airport = prof.get_airport_data(flight[4])[0]
+			flights.append({
+				'is_hotel':False,
+				'origin_code':origin_airport[2],
+				'origin_city':origin_airport[0],
+				'dest_code':dest_airport[2],
+				'dest_city':dest_airport[0],
+				'dep_time':str(flight[5])[:-2] + ':' + str(flight[5])[-2:],
+				'arr_time':str(flight[6])[:-2] + ':' + str(flight[6])[-2:],
+				'date':str(flight[1]),
+				'carrier':flight[2]
+			})
+		entries.append({
+			'entry_num': k,
+			'is_hotel':False,
+			'flights':flights,
+		})
+
+		if i==len(travelObj['hotels']):
+			break 
+
+		options = travelObj['hotels'][i]
+		hotel_id = options[selections[k]]
+		k += 1
+		hotel = prof.get_hotel(hotel_id)
+		entries.append({
+			'entry_num': k,
+			'is_hotel': True,
+			'hotel_name':hotel[3],
+			'hotel_city':hotel[1],
+			'stay_period': travelObj['citiesToVisit'][i]['stayPeriod']
+		})
+	return entries
+
+
+@app.route("/output_page", methods=["POST"])
 def output_page():
-	if request.method == "POST":
-		print("hello")
-		t = request.form.get('json')
-		travelObj = json.loads(t)
-		travelObj = handle_request(travelObj)
-		print(travelObj)
-		return render_template("output_page.html", travelObj=travelObj)
-	travelObj = {"sourceCity": "YoYo", "departureDate": date.today()}
-	return render_template("output_page.html", travelObj=travelObj)	
+	t = request.form.get('json')
+	travelObj = json.loads(t)
+	travelObj = handle_request(travelObj)
+	print(travelObj)
+
+	if not travelObj:
+		return render_template('output_page.html', plan_found=False)
+	
+	selections = [0 for i in range(len(travelObj['flight_paths']) + len(travelObj['hotels']))]
+	travelObj['selections'] = selections
+
+	entries = get_entries(travelObj, selections)
+	
+	return render_template("output_page.html", plan_found=True, travelObj=travelObj, entries=entries)
 
 @app.route("/home")
 def home():
