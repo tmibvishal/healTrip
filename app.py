@@ -165,6 +165,14 @@ def output_page():
 def home():
 	return render_template("home.html")
 
+@app.route("/get_covid_status", methods=["POST"])
+def get_covid_status():
+	# if request.method == "POST":
+	t = request.json
+	cityName = t["cityName"]
+	statusDict = home_page_queries.get_covid_status(cityName)
+	return statusDict
+
 @app.route("/city_name_suggestions", methods=["POST"])
 def city_name_suggestions():
 	# if request.method == "POST":

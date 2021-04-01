@@ -17,17 +17,17 @@ def get_covid_status(city):
     from covid_status as cs , airport_codes as ac
     where ac.city = %s
     and ac.state_code = cs.state_code;"""
-    city_pattern = '{}'.format(city)
-    status = db.fetch(query, (city_pattern, ))
-    return status
+    queryReult = db.fetch(query, (city, ))
+    if (len(queryReult) == 0):
+        statusDict = {"inDB": False}
+        return statusDict
+    status = queryReult[0]
+    statusDict = {"inDB": True, "stateCode": status[0], "deaths": status[1], "hospitalized": status[2], "inICU": status[3], "onVentilator": status[4], "positive": status[5], "recovered": status[6]}
+    return statusDict
 
 def check_direct_connection(city1,city2):
     query = """select * from direct_con where city1 = %s and city2 = %s;"""
-
-    city_pattern1 = '{}'.format(city1)
-    city_pattern2 = '{}'.format(city2)
-
-    is_direct = db.fetch(query , (city_pattern1 , city_pattern2, ))
+    is_direct = db.fetch(query , (city1 , city2, ))
 
     if len(is_direct) != 1:
         return False
@@ -41,12 +41,7 @@ def get_direct_connection(city1,city2,dep_date):
     and ac1.city = %s and ac2.city = %s
     and fl.fl_date = %s
     limit 3; """
-
-    city_pattern1 = '{}'.format(city1)
-    city_pattern2 = '{}'.format(city2)
-    date_pattern = '{}'.format(dep_date)
-
-    direct_con = db.fetch(query , (city_pattern1 , city_pattern2, date_pattern, ))
+    direct_con = db.fetch(query , (city1 , city2, dep_date, ))
 
     temp_conn = []
     for c in direct_con:
@@ -78,12 +73,7 @@ def get_connecting_flights(city1,city2,dep_date):
     group by rc.flight_ids , rc.cost
     order by cost asc
     limit 3;"""
-
-    city_pattern1 = '{}'.format(city1)
-    city_pattern2 = '{}'.format(city2)
-    date_pattern = '{}'.format(dep_date)
-
-    conn = db.fetch(query , (city_pattern1 , date_pattern , city_pattern1 , city_pattern2 , date_pattern , city_pattern1 , city_pattern2 , ))
+    conn = db.fetch(query , (city1 , dep_date , city1 , city2 , dep_date , city1 , city2 , ))
 
     temp_conn = []
     for c in conn:
