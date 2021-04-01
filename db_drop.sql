@@ -1,5 +1,5 @@
-drop index direct_con_index;
-drop materialized view direct_con;
+drop index city_distance_index;
+drop materialized view city_distance;
 
 drop index rating_index;
 drop MATERIALIZED view hotels_rating;

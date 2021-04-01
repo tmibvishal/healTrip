@@ -98,54 +98,16 @@ def get_best_hotel(city):
 
     return temp_hotels
 
-
-def no_round_trip_simple(travelObj):
+# plan a simple trip
+def trip_simple(travelObj,round):
     src_city = travelObj["sourceCity"]
     dep_date_text = travelObj["departureDate"]
     cities_to_visit = travelObj["citiesToVisit"]
-
-    dep_date = datetime.datetime(int(dep_date_text[:4]),int(dep_date_text[5:7]),int(dep_date_text[8:10]))
-
-    flight_paths = []
-    hotels = []
-
-    for city in cities_to_visit:
-        city_name = city["cityName"]
-        hotels.append(get_best_hotel(city_name))
-
-        """
-
-        if check_direct_connection(src_city , city_name):
-            flight_path_temp = get_direct_connection(src_city,city_name,dep_date)
-
-            if len(flight_path_temp) == 0:
-                flight_path_temp = get_connecting_flights(src_city,city_name,dep_date)
-
-            flight_paths.append(flight_path_temp)
-
-        else:
-        """
-        flight_paths.append(get_connecting_flights(src_city,city_name,dep_date))
-
-        src_city = city_name
-
-        time_change = datetime.timedelta(days=city["stayPeriod"])
-        dep_date = dep_date + time_change
-
-    travelObj["flight_paths"] = flight_paths
-    travelObj["hotels"] = hotels
-
-    return travelObj
-
-def round_trip_simple(travelObj):
-    src_city = travelObj["sourceCity"]
-    dep_date_text = travelObj["departureDate"]
-    cities_to_visit = travelObj["citiesToVisit"]
-
-    dep_date = datetime.datetime(int(dep_date_text[:4]),int(dep_date_text[5:7]),int(dep_date_text[8:10]))
 
     temp_city_name = src_city
 
+    dep_date = datetime.datetime(int(dep_date_text[:4]),int(dep_date_text[5:7]),int(dep_date_text[8:10]))
+
     flight_paths = []
     hotels = []
 
@@ -160,10 +122,136 @@ def round_trip_simple(travelObj):
         time_change = datetime.timedelta(days=city["stayPeriod"])
         dep_date = dep_date + time_change
 
-    # to complete round trip
-    flight_paths.append(get_connecting_flights(src_city,temp_city_name,dep_date))
+    if round:
+        flight_paths.append(get_connecting_flights(src_city,temp_city_name,dep_date))
 
     travelObj["flight_paths"] = flight_paths
     travelObj["hotels"] = hotels
 
     return travelObj
+
+# returns distance between two cities
+def get_distance(city1,city2):
+    query = """ select distance
+    from city_distance
+    where (city_distance.city1 = %s and city_distance.city2 = %s)
+    or (city_distance.city2 = %s and city_distance.city1 = %s);"""
+
+    dist = db.fetch(query , (city1 , city2 , city2 , city1, ))
+
+    if len(dist) == 0:
+        return 100000000
+
+    print(dist[0][0])
+
+    return dist[0][0]
+
+# count direct connections from city to cities in cities_to_visit
+def count_direct_connections(city,cities_to_visit,dep_date):
+    t = tuple(cities_to_visit)
+
+    if len(t) == 1:
+
+        query = """ select count(city1)
+        from (select ac1.city as city1 , ac2.city as city2
+        from airport_codes as ac1 , airport_codes as ac2 , flights as fl
+        where fl.origin = ac1.airport_code and fl.dest = ac2.airport_code
+        and fl.fl_date = %s
+        group by ac1.city , ac2.city) as dc
+        where city1 = %s 
+        and city2 = %s"""
+
+        cnt = db.fetch(query, (dep_date, city, t[0] ))
+
+        return cnt[0][0]
+
+    else:
+        query = """ select count(city1)
+        from (select ac1.city as city1 , ac2.city as city2
+        from airport_codes as ac1 , airport_codes as ac2 , flights as fl
+        where fl.origin = ac1.airport_code and fl.dest = ac2.airport_code
+        and fl.fl_date = %s
+        group by ac1.city , ac2.city) as dc
+        where city1 = %s 
+        and city2 in {}""".format(t)
+
+        cnt = db.fetch(query, (dep_date, city, ))
+
+        return cnt[0][0]
+
+# get the best ordering of cities for given list
+def get_best_ordering(city1,date,cities,city_stay_dict,round):
+    temp_src = city1
+    src_city = city1
+    dep_date = date
+    cities_to_visit = cities.copy()
+
+    i = 0
+    n = len(cities_to_visit)
+
+    best_city_path = []
+    flight_paths = []
+    hotels = []
+
+    while(i < n):
+        best_city = cities_to_visit[0]
+        max_conn = 0
+        best_city_dist = 100000000
+
+        for city in cities_to_visit:
+            cnt = count_direct_connections(city,cities_to_visit,dep_date)
+            dist = get_distance(src_city,city)
+
+            if cnt > max_conn:
+                max_conn = cnt
+                best_city = city
+                best_city_dist = dist
+
+            elif cnt == max_conn:
+                if dist < best_city_dist:
+                    best_city = city
+                    best_city_dist = dist
+
+        best_city_path.append(best_city)
+        i+=1
+
+        hotels.append(get_best_hotel(best_city))
+
+        flight_paths.append(get_connecting_flights(src_city,best_city,dep_date))
+
+        cities_to_visit.remove(best_city)
+        src_city = best_city
+
+        time_change = datetime.timedelta(days=city_stay_dict[best_city])
+        dep_date = dep_date + time_change
+
+    if round:
+        flight_paths.append(get_connecting_flights(best_city_path[-1],temp_src,dep_date))
+        best_city_path.append(temp_src)
+
+    return (flight_paths,hotels,best_city_path)
+
+
+def trip_best_ordering(travelObj,round):
+    src_city = travelObj["sourceCity"]
+    dep_date_text = travelObj["departureDate"]
+    cities_to_visit = travelObj["citiesToVisit"]
+
+    dep_date = datetime.datetime(int(dep_date_text[:4]),int(dep_date_text[5:7]),int(dep_date_text[8:10]))
+
+    city_stay_dict = {}
+    visit = []
+
+    for city in cities_to_visit:
+        city_stay_dict[city["cityName"]] = city["stayPeriod"]
+        visit.append(city["cityName"])
+
+    (flight_paths,hotels,best_city_path) = get_best_ordering(src_city,dep_date,visit,city_stay_dict,round)
+
+    travelObj["flight_paths"] = flight_paths
+    travelObj["hotels"] = hotels
+    travelObj["best_city_path"] = best_city_path
+
+    return travelObj
+
+

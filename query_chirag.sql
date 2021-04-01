@@ -9,6 +9,7 @@ create index city_index on airport_codes(city);
 */
 
 -- select the 3 best possible paths between two cities on a certain date --
+/*
 select rc.flight_ids
 from
     (with recursive reach_carr (f,t,all_ids,flight_ids,last_arr_time,cost) as (
@@ -34,6 +35,7 @@ and (rc.t = ac2.airport_code and ac2.city = 'Seattle')
 group by rc.flight_ids , rc.cost
 order by cost asc
 limit 3;
+*/
 
 -- get the covid data of a city --
 /*
@@ -60,3 +62,22 @@ and hotels.city = 'Chicago'
 group by hotels.hotel_id , hotels_rating.rating
 order by rating desc;
 */
+
+/*
+select count(city1)
+    from (select ac1.city as city1 , ac2.city as city2
+    from airport_codes as ac1 , airport_codes as ac2 , flights as fl
+    where fl.origin = ac1.airport_code and fl.dest = ac2.airport_code
+    and fl.fl_date = '2021-04-01'
+    group by ac1.city , ac2.city) as dc
+    where city1 = 'Chicago'
+    and city2 in ('Dallas','New York','Seattle');
+*/
+
+select city1 , city2 , min(distance) as distance
+from
+    (select ac1.city as city1 , ac2.city as city2 , fl.distance
+    from airport_codes as ac1 , airport_codes as ac2 , flights as fl
+    where fl.origin = ac1.airport_code and fl.dest = ac2.airport_code
+    group by ac1.city , ac2.city , fl.distance) as dist
+group by city1, city2
