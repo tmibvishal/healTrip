@@ -199,18 +199,76 @@ def get_entries(travelObj, selections):
 def output_page():
 	t = request.form.get('json')
 	travelObj = json.loads(t)
-	travelObj = handle_request(travelObj)
-	print(travelObj)
+	
+	if not 'selections' in travelObj:
+		travelObj = handle_request(travelObj)
+		print(travelObj)
 
 	if not travelObj:
 		return render_template('output_page.html', plan_found=False)
 	
-	selections = [0 for i in range(len(travelObj['flight_paths']) + len(travelObj['hotels']))]
-	travelObj['selections'] = selections
+	if not 'selections' in travelObj:
+		selections = [0 for i in range(len(travelObj['flight_paths']) + len(travelObj['hotels']))]
+		travelObj['selections'] = selections
 
-	entries = get_entries(travelObj, selections)
+	entries = get_entries(travelObj, travelObj['selections'])
 	
 	return render_template("output_page.html", plan_found=True, travelObj=travelObj, entries=entries)
+
+@app.route('/view_options', methods=['POST'])
+def view_options():
+	t = request.form.get('travelObj')
+	entry_num = int(request.form.get('entry_num'))
+	if (not t) or (not entry_num):
+		render_template('404.html')
+	
+	travelObj = json.loads(t)
+	print(travelObj)
+	print(travelObj['flight_paths'])
+
+	entries = []
+
+	if entry_num % 2 == 1: # flight
+		options = travelObj['flight_paths'][entry_num//2]
+		for i, flight_ids in enumerate(options):
+			flights = []
+			for flight_id in flight_ids:
+				flight = prof.get_flight(flight_id)
+				origin_airport = prof.get_airport_data(flight[3])[0]
+				dest_airport = prof.get_airport_data(flight[4])[0]
+				flights.append({
+					'is_hotel':False,
+					'origin_code':origin_airport[2],
+					'origin_city':origin_airport[0],
+					'dest_code':dest_airport[2],
+					'dest_city':dest_airport[0],
+					'dep_time':str(flight[5])[:-2] + ':' + str(flight[5])[-2:],
+					'arr_time':str(flight[6])[:-2] + ':' + str(flight[6])[-2:],
+					'date':str(flight[1]),
+					'carrier':flight[2]
+				})
+			entries.append({
+				'option_no': i,
+				'is_hotel':False,
+				'flights':flights,
+			})
+	else: # hotel
+		options = travelObj['hotels'][entry_num//2 -1]
+		for i, hotel_id in enumerate(options):
+			hotel = prof.get_hotel(hotel_id)
+			entries.append({
+				'option_no': i,
+				'is_hotel': True,
+				'hotel_name':hotel[3],
+				'hotel_city':hotel[1],
+				'stay_period': travelObj['citiesToVisit'][entry_num//2 - 1]['stayPeriod']
+			})
+
+	travelObj['entry_num'] = entry_num
+	travelObj['num_options'] = len(entries)
+	return render_template('view_options.html', travelObj=travelObj, entries=entries)
+
+
 
 @app.route("/home")
 def home():
