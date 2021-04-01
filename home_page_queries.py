@@ -90,8 +90,7 @@ def get_best_hotel(city):
     order by rating desc
     limit 3; """
 
-    city_pattern = '{}'.format(city)
-    hotels = db.fetch(query, (city_pattern, ))
+    hotels = db.fetch(query, (city, ))
 
     temp_hotels = []
     for h in hotels:

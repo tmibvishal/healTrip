@@ -104,7 +104,7 @@ def logout():
 
 @app.route("/")
 def index():
-	return render_template("index.html")
+	return redirect("/home")
 
 def is_valid_travel_object(travelObject):
 	if isinstance(travelObject, dict):
