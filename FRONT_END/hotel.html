@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Hotel{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="columns">
+    <div class="column col-3"></div>
+    <div class="column col-6">
+      <h3><i class="fas fa-hotel"></i>{{hotel[3]}}</h3>
+      <h6>{{hotel[1]}}, {{hotel_state}}</h6>
+      <div class='divider'></div>
+      <br>
+      <div class="tile tile-centered">
+        <div class="tile-icon">
+          <i class="fas fa-map-marker-alt"></i>
+        </div>
+        <div class="tile-content">
+          <div class="tile-title text-bold">Address</div>
+          <div class='tile-subtitle'>{{hotel[4]}}</div>
+        </div>
+      </div>
+      <br>
+      <div class="tile tile-centered">
+        <div class="tile-icon">
+          <i class="fas fa-address-card"></i>
+        </div>
+        <div class="tile-content">
+          <div class="tile-title text-bold">Postal code</div>
+          <div class='tile-subtitle'>{{hotel[5]}}</div>
+        </div>
+      </div>
+      <br>
+      <div class="tile tile-centered">
+        <div class="tile-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="tile-content">
+          <div class="tile-title text-bold">Average rating</div>
+          <div class='tile-subtitle'>{{avg_rating}} / 5</div>
+        </div>
+      </div>
+      <div class='divider'></div>
+      <br>
+      <h4>Reviews</h4>
+      {% for review in reviews %}
+      <div class='card shadowContainer'>
+      <div class="tile tile-centered">
+        <div class="tile-icon">
+            <i class="fas fa-user"></i>
+            <div class='text-bold'>{{review[4]}}</div>
+            <div>{{review[2]}}</div>
+        </div>
+        <div class="tile-content">
+          <div class="tile-title text-bold">{{review[5]}}</div>
+          <div>{{review[6]}}</div>
+        </div>
+        <div class="tile-action">
+            <i class="fas fa-star"></i><div class='text-bold'>{{review[3]}}</div>
+        </div>
+      </div>
+      </div>
+      <br>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

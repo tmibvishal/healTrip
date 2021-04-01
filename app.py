@@ -104,7 +104,7 @@ def logout():
 
 @app.route("/")
 def index():
-	return render_template("index.html")
+	return redirect("/home")
 
 def is_valid_travel_object(travelObject):
 	if isinstance(travelObject, dict):
@@ -164,6 +164,14 @@ def output_page():
 @app.route("/home")
 def home():
 	return render_template("home.html")
+
+@app.route("/get_covid_status", methods=["POST"])
+def get_covid_status():
+	# if request.method == "POST":
+	t = request.json
+	cityName = t["cityName"]
+	statusDict = home_page_queries.get_covid_status(cityName)
+	return statusDict
 
 @app.route("/city_name_suggestions", methods=["POST"])
 def city_name_suggestions():
@@ -263,7 +271,6 @@ def booking_details(booking_id):
 	for booking_entry in booking_entries:
 		if(booking_entry[2]): # hotel
 			hotel = prof.get_hotel(booking_entry[3])
-			hotel = hotel[0]
 			entries.append({
 				'is_hotel':True,
 				'hotel_name':hotel[3],
@@ -271,7 +278,7 @@ def booking_details(booking_id):
 				'stay_period':booking_entry[4]
 			})
 		else:
-			flight = prof.get_flight(booking_entry[3])[0]
+			flight = prof.get_flight(booking_entry[3])
 			origin_airport = prof.get_airport_data(flight[3])[0]
 			dest_airport = prof.get_airport_data(flight[4])[0]
 			entries.append({
@@ -286,6 +293,29 @@ def booking_details(booking_id):
 				'carrier':flight[2]
 			})
 	return render_template('booking_details.html', entries=entries, dep_date=dep_date)
+
+@app.route('/hotel/<hotel_id>')
+def hotel_page(hotel_id):
+	hotel = prof.get_hotel(hotel_id)
+	if not hotel:
+		return render_template('404.html')
+	
+	reviews = prof.get_reviews(hotel_id)
+	
+	sum_ratings, num_ratings = 0, 0
+	for review in reviews:
+		num_ratings += 1
+		sum_ratings += int(review[3])
+	avg_rating = -1
+	if num_ratings > 0:
+		avg_rating = sum_ratings / num_ratings
+		avg_rating = "{:.2f}".format(avg_rating)
+
+	hotel_state = prof.get_state(hotel[2])
+	if not hotel_state:
+		return render_template('404.html')
+
+	return render_template('hotel.html', hotel=hotel, reviews=reviews, avg_rating=avg_rating, hotel_state=hotel_state)
 
 @app.route("/<name>")
 def user(name):

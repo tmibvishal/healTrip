@@ -8,15 +8,15 @@
       <h4><i class="fas fa-sort"></i> Home Page</h4>
       <ul class="step">
         <li class="step-item active">
-          <a href="#" class="tooltip" data-tooltip="Choose from and vacation destination cities">Home</a>
+          <a href="{{ url_for('home') }}" class="tooltip" data-tooltip="Choose from and vacation destination cities">Choose from and to</a>
         </li>
         <li class="step-item">
-          <a href="#" class="tooltip"
+          <a class="tooltip"
             data-tooltip="Order the cities in which you want to visit them and add stay period in number of days">Order
             Cities</a>
         </li>
         <li class="step-item">
-          <a href="#" class="tooltip" data-tooltip="Choose hotels and finalize">Choose Hotels</a>
+          <a class="tooltip" data-tooltip="Choose hotels and finalize">Choose Hotels</a>
         </li>
       </ul>
       <blockquote>
@@ -50,8 +50,20 @@
             <div class="autocomplete form-group">
               <div class="input-group">
                 <input class="form-input input-sm" id="cities0" type="text" style="margin-bottom: 5px;">
-                <button class="btn btn-primary input-group-btn btn-sm" id="buttonCovidStatus0">Show covid
-                  status</button>
+
+
+                <div class="popover popover-right">
+                  <input class="btn btn-primary input-group-btn btn-sm" id="buttonCovidStatus0" value="Show covid status"></input>
+                  <div class="popover-container">
+                    <div class="card">
+                      <div class="card-header"><strong>Covid Data for this city</strong></div>
+                      <div class="card-body">
+                        <div class="loading"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </form>
@@ -154,10 +166,43 @@
             /*execute a function when someone clicks on the item value (DIV element):*/
             b.addEventListener("click", function (e) {
               /*insert the value for the autocomplete text field:*/
-              input_text_box.value = this.getElementsByTagName("input")[0].value;
+              let cityName = this.getElementsByTagName("input")[0].value;
+              input_text_box.value = cityName;
               /*close the list of autocompleted values,
               (or any other open lists of autocompleted values:*/
               closeAllLists();
+
+              $.ajax({
+                url: '/get_covid_status',
+                type: 'POST',
+                data: JSON.stringify({
+                  "cityName": cityName
+                }),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                async: true,
+                success: function (covidStatus) {
+                  let card = input_text_box.parentNode.children[1];
+                  if (card != null) {
+                    if (covidStatus["inDB"]) {
+                      formattedStatus = ""
+                      for (let [key, value] of Object.entries(covidStatus)) {
+                        formattedStatus += `<strong>${key}:</strong> ${value}<br>`
+                      }
+                      card.children[1].firstElementChild.children[1]
+                        .innerHTML = formattedStatus;
+                    } else {
+                      card.children[1].firstElementChild.children[1]
+                        .innerText = "Can't find covid data for this city in the database";
+                    }
+                  } else {
+
+                  }
+                  
+                  // console.log(covidStatus);
+                }
+              });
+
             });
             a.appendChild(b);
           }
@@ -241,7 +286,10 @@
       for (var i = 0; i < table.children.length; i++) {
         var cityName = document.getElementById("cities" + i.toString()).value;
         //var cityName = rows.item(i).cells.item(0).value;
-        arr.push({"cityName": cityName, "stayPeriod": 1}); // stayPeriod will be ignored and will be taken as input in order cities page again
+        arr.push({
+          "cityName": cityName,
+          "stayPeriod": 1
+        }); // stayPeriod will be ignored and will be taken as input in order cities page again
       }
 
       var round_trip = document.getElementById("round_trip").checked;
@@ -251,10 +299,14 @@
         "departureDate": new Date(dep_date),
         "citiesToVisit": arr,
         "roundTrip": round_trip,
-        "chooseBestOrdering": false 
+        "chooseBestOrdering": false
       } // chooseBestOrdering will be ignored in order cities page and will be taken as input in order cities page itself
 
-      post("/order_cities", {"json": JSON.stringify(travelObj)});
+      // TODO: make checks while sending the data at frontend
+
+      post("/order_cities", {
+        "json": JSON.stringify(travelObj)
+      });
     }
   }
 
@@ -271,12 +323,19 @@
     inputElement.id = "cities" + rowCount.toString();
     inputElement.type = "text";
     autocomplete(inputElement);
-    let buttonElement = document.createElement("button");
-    buttonElement.classList = "btn btn-primary input-group-btn btn-sm";
-    buttonElement.id = "buttonCovidStatus" + rowCount.toString();
-    buttonElement.innerText = "Show covid status";
+    let popOverElement = document.createElement("div");
+    popOverElement.classList = "popover popover-right";
+    popOverElement.innerHTML = `<input class="btn btn-primary input-group-btn btn-sm" id="buttonCovidStatus${rowCount.toString()}" value="Show covid status"></input>
+      <div class="popover-container">
+        <div class="card">
+          <div class="card-header"><strong>Covid Data for this city</strong></div>
+          <div class="card-body">
+            <div class="loading"></div>
+          </div>
+        </div>
+      </div>`
     inputGroupDivElement.append(inputElement);
-    inputGroupDivElement.append(buttonElement);
+    inputGroupDivElement.append(popOverElement);
     mainDivElement.append(inputGroupDivElement);
     table.appendChild(mainDivElement);
   }

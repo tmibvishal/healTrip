@@ -8,15 +8,15 @@
       <h4><i class="fas fa-sort"></i> Cities Ordering</h4>
       <ul class="step">
         <li class="step-item">
-          <a href="#" class="tooltip" data-tooltip="Choose from and vacation destination cities">Home</a>
+          <a href="{{ url_for('home') }}" class="tooltip" data-tooltip="Choose from and vacation destination cities">Choose from and to</a>
         </li>
         <li class="step-item active">
-          <a href="#" class="tooltip"
+          <a class="tooltip"
             data-tooltip="Order the cities in which you want to visit them and add stay period in number of days">Order
             Cities</a>
         </li>
         <li class="step-item">
-          <a href="#" class="tooltip" data-tooltip="Choose hotels and finalize">Choose Hotels</a>
+          <a class="tooltip" data-tooltip="Choose hotels and finalize">Choose Hotels</a>
         </li>
       </ul>
       <blockquote>
@@ -26,7 +26,7 @@
       {% if travelObj == None %}
         Looks like you didn't visit this page from home page. Or maybe you passed some wrong value from home page.
         <br>
-        Go back to the <a href="url_for('home')">home page</a> and then visit this page.
+        Go back to the <a href="{{ url_for('home') }}">home page</a> and then visit this page.
       {% else %}
       <div class="card shadowContainer">
         <div class="card-header">
@@ -58,6 +58,15 @@
               class="icon icon-arrow-down"></i></button>
         </div>
       </div>
+      <br>
+      <label class="form-checkbox">
+        {% if travelObj["roundTrip"] %}
+        <input type="checkbox" id="round_trip" name="round_trip" checked>
+        {% else %}
+        <input type="checkbox" id="round_trip" name="round_trip">
+        {% endif %}
+        <i class="form-icon"></i> Round Trip
+      </label>
       <br>
       <button class="btn btn-primary btn-lg" onclick="sendRequest(0)">Visit Cities in Order Given</button>
       <button class="btn btn-primary btn-lg" onclick="sendRequest(1)">Choose Best Order</button>
@@ -128,6 +137,8 @@
     var src_text = document.getElementById("src_city").innerText;
     var src_city = src_text.substring(13);
 
+    var round_trip = document.getElementById("round_trip").checked;
+    
     var dep_text = document.getElementById("dep_date").innerText;
     var dep_date = dep_text.substring(16);
 
@@ -135,7 +146,7 @@
       "sourceCity": src_city,
       "departureDate": dep_date,
       "chooseBestOrdering": chooseBestOrdering,
-      "roundTrip": true,
+      "roundTrip": round_trip,
       "citiesToVisit": arr
     }
 
