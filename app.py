@@ -121,6 +121,23 @@ def is_valid_travel_object(travelObject):
 											return True
 	return False
 
+def handle_request(travelObj):
+	#if is_valid_travel_object(travelObj):
+	if travelObj["chooseBestOrdering"]:
+		return None
+	else:
+		if travelObj["roundTrip"]:
+			return home_page_queries.round_trip_simple(travelObj)
+		else:
+			print("checking no round trip")
+			return home_page_queries.no_round_trip_simple(travelObj)
+
+	"""
+	else:
+		print("not valid")
+		return None
+	"""
+
 @app.route("/order_cities", methods=["GET", "POST"])
 def order_cities():
 	if request.method == "POST":
@@ -138,45 +155,15 @@ def output_page():
 		print("hello")
 		t = request.form.get('json')
 		travelObj = json.loads(t)
+		travelObj = handle_request(travelObj)
 		print(travelObj)
 		return render_template("output_page.html", travelObj=travelObj)
 	travelObj = {"sourceCity": "YoYo", "departureDate": date.today()}
-	return render_template("output_page.html", travelObj=travelObj)
-
-def process_data(travelObj):
-	# TODO: try to take input of gap time
-	query = """
-	WITH RECURSIVE all_paths(originairportid, destairportid, curpath, arr_date, arr_time) AS (
-		SELECT originairportid, destairportid, ARRAY[originairportid, destairportid], (CASE WHEN (crs_dep_time<crs_arr_time) THEN fl_date ELSE  (fl_date+INTERVAL '1 day')), crs_arr_time FROM (flights F JOIN airport_codes AC ON (F.origin=AC.airport_code AND city="Chicago"))
-		UNION
-		SELECT all_paths.originairportid, flights.destairportid, array_append(curpath, flights.destairportid), (CASE WHEN (crs_dep_time<crs_arr_time) THEN fl_date ELSE  (fl_date+INTERVAL '1 day')), crs_arr_time FROM all_paths, flights WHERE (all_paths.destairportid=flights.originairportid AND NOT (flights.destairportid = ANY(curpath)) AND (crs_dep_time<crs_arr_time OR arr_date<fl_date))
-	)
-	SELECT originairportid, destairportid, arr_date, arr_time AS length FROM (
-		all_paths AP JOIN airport_codes AC ON (AC.airport_code=AP.destairportid AND AC.city="Dallas")
-	) ORDER BY arr_date DESC, arr_time DESC LIMIT 1;
-	"""
+	return render_template("output_page.html", travelObj=travelObj)	
 
 @app.route("/home")
 def home():
 	return render_template("home.html")
-
-# check these methods for autocomplete
-@app.route("/home" , methods=["GET"])
-def init_autocomplete():
-	home_page_queries.init_autocomplete()
-	initialise_autocomplete = True
-	#complete rest
-
-def get_cities(input):
-	if not initialise_autocomplete:
-		init_autocomplete()
-	cities = home_page_queries.get_all_cities(input)
-	return cities
-
-# complete this method to render the covid status
-def get_covid_status(city):
-	status = home_page_queries.get_covid_status(city)
-	return status
 
 @app.route("/city_name_suggestions", methods=["POST"])
 def city_name_suggestions():
