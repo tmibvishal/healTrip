@@ -105,6 +105,7 @@
             document.getElementById('option-'+current_selection.toString()).innerHTML='Select'
 
             current_selection = i;
+            travelObj.selections[travelObj.entry_num-1] = current_selection;
 
             document.getElementById('option-'+current_selection.toString()).classList.toggle('btn-primary')
             document.getElementById('option-'+current_selection.toString()).innerHTML='<i class="fas fa-check"></i>Selected'
@@ -112,7 +113,6 @@
     }
 
     document.getElementById('final_submit').onclick = () => {
-        travelObj.selections[travelObj.entry_num-1] = current_selection;
             post("/output_page", {
                 'json':JSON.stringify(travelObj),
             });

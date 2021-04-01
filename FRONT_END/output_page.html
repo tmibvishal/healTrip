@@ -88,7 +88,7 @@
             {% endif %}
             {% endfor %}
             <br>
-            <button class="btn btn-primary btn-lg" onclick="sendRequest(0)">Book the flights and hotels</button>
+            <button class="btn btn-primary btn-lg" id="book_final">Book the flights and hotels</button>
             <br>
             {% endif %}
             {% if not plan_found %}
@@ -100,7 +100,7 @@
                 <p class="empty-subtitle">Please consider tweaking your plan</p>
                 <div class="empty-action">
                     <a href="/">
-                        <button class="btn btn-primary">Back to home</button>
+                        <button class="btn btn-primary" >Back to home</button>
                     </a>
                 </div>
             </div>
@@ -121,5 +121,12 @@
             });
         }
     }
+
+    document.getElementById('book_final').onclick = () => {
+        post('/book_trip', {
+            'json':JSON.stringify(travelObj)
+        })
+    }
+    
 </script>
 {% endblock %}

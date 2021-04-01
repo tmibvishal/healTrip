@@ -7,6 +7,7 @@ import db
 import auth_queries as auth
 import profile_queries as prof
 import home_page_queries
+import booking_queries as book
 
 app = Flask(__name__, static_url_path='/FRONT_END/src', static_folder='FRONT_END/src', template_folder='FRONT_END')
 app.config['SECRET_KEY'] = 'we are the champions'
@@ -431,6 +432,40 @@ def hotel_page(hotel_id):
 		return render_template('hotel.html', preview=True, travelObj=travelObj, hotel=hotel, reviews=reviews, avg_rating=avg_rating, hotel_state=hotel_state)
 
 	return render_template('hotel.html', preview=False, hotel=hotel, reviews=reviews, avg_rating=avg_rating, hotel_state=hotel_state)
+
+@app.route('/book_trip', methods=['POST'])
+@login_required
+def book_trip():
+	t = request.form.get('json')
+	travelObj = json.loads(t)
+
+	selections = travelObj['selections']
+	first_flight_id = travelObj['flight_paths'][0][selections[0]][0]
+
+	first_flight = prof.get_flight(first_flight_id)
+	
+	source_airport_code = first_flight[3]
+	user_id = current_user.id
+	departure_date = travelObj['departureDate']
+
+	book.add_booking(source_airport_code, user_id, departure_date)
+	booking_id = book.get_last_booking_id(user_id)
+
+	hotel_i, flight_i = 0, 0
+	for k in range(len(selections)):
+		if k % 2 == 0: # flight
+			flight_ids = travelObj['flight_paths'][flight_i][selections[k]]
+			for flight_id in flight_ids:
+				book.add_flight_entry(booking_id, flight_id)
+			flight_i += 1
+		else:
+			hotel_id = travelObj['hotels'][hotel_i][selections[k]]
+			stay_period = travelObj['citiesToVisit'][hotel_i]['stayPeriod']
+			book.add_hotel_entry(booking_id, hotel_id, stay_period)
+			hotel_i += 1
+
+	return redirect(url_for('profile'))
+
 
 @app.route("/<name>")
 def user(name):
