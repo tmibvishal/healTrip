@@ -259,6 +259,7 @@ def view_options():
 			entries.append({
 				'option_no': i,
 				'is_hotel': True,
+				'hotel_id':hotel_id,
 				'hotel_name':hotel[3],
 				'hotel_city':hotel[1],
 				'stay_period': travelObj['citiesToVisit'][entry_num//2 - 1]['stayPeriod']
@@ -403,7 +404,7 @@ def booking_details(booking_id):
 			})
 	return render_template('booking_details.html', entries=entries, dep_date=dep_date)
 
-@app.route('/hotel/<hotel_id>')
+@app.route('/hotel/<hotel_id>', methods=['GET','POST'])
 def hotel_page(hotel_id):
 	hotel = prof.get_hotel(hotel_id)
 	if not hotel:
@@ -424,7 +425,12 @@ def hotel_page(hotel_id):
 	if not hotel_state:
 		return render_template('404.html')
 
-	return render_template('hotel.html', hotel=hotel, reviews=reviews, avg_rating=avg_rating, hotel_state=hotel_state)
+	if request.method=='POST':
+		t = request.form.get('json')
+		travelObj = json.loads(t)
+		return render_template('hotel.html', preview=True, travelObj=travelObj, hotel=hotel, reviews=reviews, avg_rating=avg_rating, hotel_state=hotel_state)
+
+	return render_template('hotel.html', preview=False, hotel=hotel, reviews=reviews, avg_rating=avg_rating, hotel_state=hotel_state)
 
 @app.route("/<name>")
 def user(name):

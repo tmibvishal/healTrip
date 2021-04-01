@@ -9,6 +9,10 @@
       <h6>{{hotel[1]}}, {{hotel_state}}</h6>
       <div class='divider'></div>
       <br>
+      {% if preview %}
+      <button class='btn btn-primary' id='go_back'>Back to options</button>
+      <br>
+      {% endif %}
       <div class="tile tile-centered">
         <div class="tile-icon">
           <i class="fas fa-map-marker-alt"></i>
@@ -63,5 +67,16 @@
     </div>
   </div>
 </div>
+{% if preview %}
+<script>
+  let travelObj = {{ travelObj|tojson }};
 
+  document.getElementById('go_back').onclick = () => {
+    post("/view_options", {
+      'travelObj':JSON.stringify(travelObj),
+      'entry_num':travelObj.entry_num
+    });
+  }
+</script>
+{% endif %}
 {% endblock %}
