@@ -98,14 +98,17 @@ create table covid_status(
 
 create index city_index on airport_codes(city); -- So that auto complete feature will work faster on home page --
 
-CREATE MATERIALIZED VIEW direct_con
+CREATE MATERIALIZED VIEW city_distance
     as
-    select ac1.city as city1 , ac2.city as city2
-    from airport_codes as ac1 , airport_codes as ac2 , flights as fl
-    where fl.origin = ac1.airport_code and fl.dest = ac2.airport_code
-    group by ac1.city , ac2.city;
+    select city1 , city2 , min(distance) as distance
+    from
+        (select ac1.city as city1 , ac2.city as city2 , fl.distance
+        from airport_codes as ac1 , airport_codes as ac2 , flights as fl
+        where fl.origin = ac1.airport_code and fl.dest = ac2.airport_code
+        group by ac1.city , ac2.city , fl.distance) as dist
+    group by city1, city2;
 
-create index direct_con_index on direct_con(city1,city2);
+create index city_distance_index on city_distance(city1,city2);
 
 create MATERIALIZED view hotels_rating
 as

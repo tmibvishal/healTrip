@@ -124,13 +124,16 @@ def is_valid_travel_object(travelObject):
 def handle_request(travelObj):
 	#if is_valid_travel_object(travelObj):
 	if travelObj["chooseBestOrdering"]:
-		return None
+		if travelObj["roundTrip"]:
+			return home_page_queries.trip_best_ordering(travelObj,True)
+		else:
+			return home_page_queries.trip_best_ordering(travelObj,False)
+		
 	else:
 		if travelObj["roundTrip"]:
-			return home_page_queries.round_trip_simple(travelObj)
+			return home_page_queries.trip_simple(travelObj,True)
 		else:
-			print("checking no round trip")
-			return home_page_queries.no_round_trip_simple(travelObj)
+			return home_page_queries.trip_simple(travelObj,False)
 
 	"""
 	else:
