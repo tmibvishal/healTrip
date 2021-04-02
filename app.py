@@ -105,7 +105,7 @@ def logout():
 
 @app.route("/")
 def index():
-	return redirect("/home")
+	return render_template('front_page.html')
 
 def is_valid_travel_object(travelObject):
 	if isinstance(travelObject, dict):
@@ -158,44 +158,66 @@ def get_entries(travelObj, selections):
 	k = 0
 	for i in range(len(travelObj['flight_paths'])):
 		options = travelObj['flight_paths'][i]
-		flight_ids = options[selections[k]]
-		k += 1
-		flights = []
-		for flight_id in flight_ids:
-			flight = prof.get_flight(flight_id)
-			origin_airport = prof.get_airport_data(flight[3])[0]
-			dest_airport = prof.get_airport_data(flight[4])[0]
-			flights.append({
+		#print(options)
+		if len(options) == 0:
+			k += 1
+			entries.append({
+				'entry_num': k,
 				'is_hotel':False,
-				'origin_code':origin_airport[2],
-				'origin_city':origin_airport[0],
-				'dest_code':dest_airport[2],
-				'dest_city':dest_airport[0],
-				'dep_time':str(flight[5])[:-2] + ':' + str(flight[5])[-2:],
-				'arr_time':str(flight[6])[:-2] + ':' + str(flight[6])[-2:],
-				'date':str(flight[1]),
-				'carrier':flight[2]
+				'is_empty':True,
 			})
-		entries.append({
-			'entry_num': k,
-			'is_hotel':False,
-			'flights':flights,
-		})
+
+		else:
+			flight_ids = options[selections[k]]
+			k += 1
+			flights = []
+			for flight_id in flight_ids:
+				flight = prof.get_flight(flight_id)
+				origin_airport = prof.get_airport_data(flight[3])[0]
+				dest_airport = prof.get_airport_data(flight[4])[0]
+				flights.append({
+					'is_hotel':False,
+					'origin_code':origin_airport[2],
+					'origin_city':origin_airport[0],
+					'dest_code':dest_airport[2],
+					'dest_city':dest_airport[0],
+					'dep_time':str(flight[5])[:-2] + ':' + str(flight[5])[-2:],
+					'arr_time':str(flight[6])[:-2] + ':' + str(flight[6])[-2:],
+					'date':str(flight[1]),
+					'carrier':flight[2]
+				})
+			entries.append({
+				'entry_num': k,
+				'is_hotel':False,
+				'flights':flights,
+				'is_empty':False,
+			})
 
 		if i==len(travelObj['hotels']):
 			break 
 
 		options = travelObj['hotels'][i]
-		hotel_id = options[selections[k]]
-		k += 1
-		hotel = prof.get_hotel(hotel_id)
-		entries.append({
-			'entry_num': k,
-			'is_hotel': True,
-			'hotel_name':hotel[3],
-			'hotel_city':hotel[1],
-			'stay_period': travelObj['citiesToVisit'][i]['stayPeriod']
-		})
+
+		if len(options) == 0:
+			k += 1
+			entries.append({
+				'entry_num': k,
+				'is_hotel':True,
+				'is_empty':True,
+			})
+
+		else:
+			hotel_id = options[selections[k]]
+			k += 1
+			hotel = prof.get_hotel(hotel_id)
+			entries.append({
+				'entry_num': k,
+				'is_hotel': True,
+				'hotel_name':hotel[3],
+				'hotel_city':hotel[1],
+				'stay_period': travelObj['citiesToVisit'][i]['stayPeriod'],
+				'is_empty': False,
+			})
 	return entries
 
 
