@@ -27,6 +27,22 @@
             </blockquote>
             <span class="label label-rounded mr-1">Source City: {{ travelObj["sourceCity"] }}</span>
             <span class="label label-rounded mr-1">Departure Date: {{ travelObj["departureDate"] }}</span>
+            {% if travelObj["chooseBestOrdering"] == 1 %}
+            <div class="card shadowContainer">
+                <div class="card-header">
+                    <h3>This is the best ordering of cities we propose!</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="step">
+                        {% for city in travelObj["best_city_path"] %}
+                            <li class="step-item">
+                                <a> {{city}} </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
             <div class="divider"></div>
             {% for entry in entries %}
             {% if entry['is_hotel'] == 1 %}

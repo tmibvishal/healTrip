@@ -25,15 +25,6 @@ def get_covid_status(city):
     statusDict = {"inDB": True, "stateCode": status[0], "deaths": status[1], "hospitalized": status[2], "inICU": status[3], "onVentilator": status[4], "positive": status[5], "recovered": status[6]}
     return statusDict
 
-def check_direct_connection(city1,city2):
-    query = """select * from direct_con where city1 = %s and city2 = %s;"""
-    is_direct = db.fetch(query , (city1 , city2, ))
-
-    if len(is_direct) != 1:
-        return False
-
-    return True
-
 def get_direct_connection(city1,city2,dep_date):
     query = """select fl.flight_id
     from airport_codes as ac1 , airport_codes as ac2 , flights as fl
@@ -141,8 +132,6 @@ def get_distance(city1,city2):
 
     if len(dist) == 0:
         return 100000000
-
-    print(dist[0][0])
 
     return dist[0][0]
 
