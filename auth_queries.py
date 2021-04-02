@@ -29,3 +29,10 @@ def update_password(userid, password):
 
 def delete_user(userid):
     db.commit("delete from users where userid=%s", (userid, ))
+
+def disable_city(city):
+    "hotels, airport codes"
+    pass
+
+def enable_city(city):
+    pass

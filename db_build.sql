@@ -8,10 +8,16 @@ create table users(
     constraint unique_username UNIQUE (uname)
 );
 
+-- TODO VishalS: add triggers and make starting 5 table er diagram
+create table disabled_cities(
+    city text,
+);
+
 create table airport_codes(
     city text ,
     state_code text ,
     airport_code text,
+    enabled boolean default true,
     constraint airport_key primary key (airport_code)
 );
 
@@ -35,6 +41,7 @@ create table booking_entry(
     constraint booking_ref foreign key (booking_id) references bookings(id) on delete cascade
 );
 
+-- TODO Chirag: only include airport that are enabled - these 2 tables ka ER diagram bna
 create table flights(
     flight_id integer,
     fl_date date ,
@@ -56,6 +63,7 @@ create table hotels(
     name text,
     address text,
     postalcode text,
+    enabled boolean default true,
     constraint hotel_key primary key (hotel_id)
 );
 
@@ -119,3 +127,6 @@ as
 
 create index rating_index on hotels_rating(hotel_id);
 
+
+
+-- TODO Bindal: make last 3 ER table diagram --
