@@ -74,6 +74,7 @@ select count(city1)
     and city2 in ('Dallas','New York','Seattle');
 */
 
+/*
 select city1 , city2 , min(distance) as distance
 from
     (select ac1.city as city1 , ac2.city as city2 , fl.distance
@@ -81,3 +82,8 @@ from
     where fl.origin = ac1.airport_code and fl.dest = ac2.airport_code
     group by ac1.city , ac2.city , fl.distance) as dist
 group by city1, city2
+*/
+
+select ac.city 
+from airport_codes as ac
+where ac.city not in (select city from hotels);

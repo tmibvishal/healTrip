@@ -46,60 +46,94 @@
             <div class="divider"></div>
             {% for entry in entries %}
             {% if entry['is_hotel'] == 1 %}
-            <div class="card shadowContainer">
-                <div class="card-header">
-                </div>
-                <div class="card-body">
-                    <div class="tile tile-centered">
-                        <div class="tile-icon">
-                            <i class="fas fa-hotel"></i>
-                        </div>
-                        <div class="tile-content">
-                            <div class="text-bold">{{entry['hotel_name']}}</div>
-                            <div class='tile-subtitle'>{{entry['hotel_city']}}</div>
-                            <div>{{entry['stay_period']}} days stay</div>
-                        </div>
-                        <div class="tile-action">
-                            <button class='btn' id='entry-{{entry['entry_num']}}'>View options</button>
+                {% if entry['is_empty'] == 0 %}
+                <div class="card shadowContainer">
+                    <div class="card-header">
+                    </div>
+                    <div class="card-body">
+                        <div class="tile tile-centered">
+                            <div class="tile-icon">
+                                <i class="fas fa-hotel"></i>
+                            </div>
+                            <div class="tile-content">
+                                <div class="text-bold">{{entry['hotel_name']}}</div>
+                                <div class='tile-subtitle'>{{entry['hotel_city']}}</div>
+                                <div>{{entry['stay_period']}} days stay</div>
+                            </div>
+                            <div class="tile-action">
+                                <button class='btn' id='entry-{{entry['entry_num']}}'>View options</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                {% endif %}
+
+                {% if entry['is_empty'] == 1 %}
+                <div class="card shadowContainer">
+                    <div class="card-header">
+                    </div>
+                    <div class="card-body">
+                        <div class="tile tile-centered">
+                            <div class="tile-content">
+                                <h4>Sorry it appears that there are no available hotels in the city currently!</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
             <br>
             {% endif %}
             {% if entry['is_hotel'] == 0 %}
-            <div class="card shadowContainer">
-                <div class="card-header">
-                </div>
-                <div class="card-body">
-                    <div class="tile tile-centered">
-                        <div class="tile-icon">
-                            <i class="fas fa-plane"></i>
-                        </div>
-                        <div class="tile-content">
-                            {% for flight in entry['flights'] %}
-                            <div class='text-bold'>Carrier: {{flight['carrier']}}</div>
-                            <div>{{flight['date']}}</div>
-                            <ul class="step">
-                                <li class="step-item">
-                                    <a href="#" class="tooltip tooltip-right"
-                                        data-tooltip="Departure at {{flight['dep_time']}}">{{flight['origin_code']}},
-                                        {{flight['origin_city']}}</a>
-                                </li>
-                                <li class="step-item">
-                                    <a href="#" class="tooltip tooltip-left"
-                                        data-tooltip="Arrival at {{flight['arr_time']}}">{{flight['dest_code']}},
-                                        {{flight['dest_city']}}</a>
-                                </li>
-                            </ul>
-                            {% endfor %}
-                        </div>
-                        <div class="tile-action">
-                            <button class='btn' id='entry-{{entry['entry_num']}}'>View options</button>
+                {% if entry['is_empty'] == 0 %}
+                <div class="card shadowContainer">
+                    <div class="card-header">
+                    </div>
+                    <div class="card-body">
+                        <div class="tile tile-centered">
+                            <div class="tile-icon">
+                                <i class="fas fa-plane"></i>
+                            </div>
+                            <div class="tile-content">
+                                {% for flight in entry['flights'] %}
+                                <div class='text-bold'>Carrier: {{flight['carrier']}}</div>
+                                <div>{{flight['date']}}</div>
+                                <ul class="step">
+                                    <li class="step-item">
+                                        <a href="#" class="tooltip tooltip-right"
+                                            data-tooltip="Departure at {{flight['dep_time']}}">{{flight['origin_code']}},
+                                            {{flight['origin_city']}}</a>
+                                    </li>
+                                    <li class="step-item">
+                                        <a href="#" class="tooltip tooltip-left"
+                                            data-tooltip="Arrival at {{flight['arr_time']}}">{{flight['dest_code']}},
+                                            {{flight['dest_city']}}</a>
+                                    </li>
+                                </ul>
+                                {% endfor %}
+                            </div>
+                            <div class="tile-action">
+                                <button class='btn' id='entry-{{entry['entry_num']}}'>View options</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                {% endif %}
+
+                {% if entry['is_empty'] == 1 %}
+                <div class="card shadowContainer">
+                    <div class="card-header">
+                    </div>
+                    <div class="card-body">
+                        <div class="tile tile-centered">
+                            <div class="tile-content">
+                                <h4>Sorry it appears that there are no available flights for you to travel!</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
             <br>
             {% endif %}
             {% endfor %}
