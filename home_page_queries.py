@@ -48,15 +48,16 @@ def get_connecting_flights(city1,city2,dep_date):
     from
         (with recursive reach_carr (f,t,all_ids,flight_ids,last_arr_time,cost) as (
                 (select origin,dest,ARRAY[origin] , ARRAY[fl.flight_id] ,fl.crs_arr_time, fl.distance
-                from flights as fl , airport_codes as ac1
-                where fl.origin = ac1.airport_code and ac1.city = %s 
+                from flights as fl , airport_codes as ac1 , airport_codes as ac2
+                where fl.origin = ac1.airport_code and ac1.city = %s and ac1.enabled
+                and fl.dest = ac2.airport_code and ac2.enabled 
                 and fl.fl_date = %s)
                 union
                 (select rc.f,fl.dest,all_ids || fl.origin , flight_ids || fl.flight_id , fl.crs_arr_time , rc.cost + fl.distance
                 from reach_carr as rc,flights as fl , airport_codes as ac1 , airport_codes as ac2
                 where (rc.t = fl.origin)
-                and (rc.f = ac1.airport_code and ac1.city = %s)
-                and (rc.t <> ac2.airport_code and ac2.city = %s)
+                and (rc.f = ac1.airport_code and ac1.city = %s and ac1.enabled)
+                and (rc.t <> ac2.airport_code and ac2.city = %s and ac2.enabled)
                 and fl.crs_dep_time > rc.last_arr_time
                 and fl.fl_date = %s
                 and fl.dest <> ANY(all_ids)
@@ -80,6 +81,7 @@ def get_best_hotel(city):
     from hotels , hotels_rating
     where hotels.hotel_id = hotels_rating.hotel_id
     and hotels.city = %s
+    and hotels.enabled
     group by hotels.hotel_id , hotels_rating.rating
     order by rating desc
     limit 10; """
