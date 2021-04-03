@@ -143,6 +143,7 @@ def handle_request(travelObj):
 	"""
 
 @app.route("/order_cities", methods=["GET", "POST"])
+@login_required
 def order_cities():
 	if request.method == "POST":
 		t = request.form.get('json')
@@ -221,27 +222,35 @@ def get_entries(travelObj, selections):
 	return entries
 
 
-@app.route("/output_page", methods=["POST"])
+@app.route("/output_page", methods=["GET", "POST"])
+@login_required
 def output_page():
-	t = request.form.get('json')
-	travelObj = json.loads(t)
-	
-	if not 'selections' in travelObj:
-		travelObj = handle_request(travelObj)
-		print(travelObj)
+	if request.method == "POST":
+		t = request.form.get('json')
+		travelObj = json.loads(t)
+		
+		if not 'selections' in travelObj:
+			travelObj = handle_request(travelObj)
+			print(travelObj)
 
-	if not travelObj:
-		return render_template('output_page.html', plan_found=False)
-	
-	if not 'selections' in travelObj:
-		selections = [0 for i in range(len(travelObj['flight_paths']) + len(travelObj['hotels']))]
-		travelObj['selections'] = selections
+		if not travelObj:
+			return render_template('output_page.html', plan_found=False)
+		
+		if not 'selections' in travelObj:
+			selections = [0 for i in range(len(travelObj['flight_paths']) + len(travelObj['hotels']))]
+			travelObj['selections'] = selections
 
-	entries = get_entries(travelObj, travelObj['selections'])
+		if not is_valid_travel_object(travelObj):
+			return render_template("output_page.html", travelObj=None)
+
+		entries = get_entries(travelObj, travelObj['selections'])
+		
+		return render_template("output_page.html", plan_found=True, travelObj=travelObj, entries=entries)
 	
-	return render_template("output_page.html", plan_found=True, travelObj=travelObj, entries=entries)
+	return render_template("output_page.html", travelObj=None)
 
 @app.route('/view_options', methods=['POST'])
+@login_required
 def view_options():
 	t = request.form.get('travelObj')
 	entry_num = int(request.form.get('entry_num'))
@@ -298,18 +307,23 @@ def view_options():
 
 
 @app.route("/home")
+@login_required
 def home():
 	return render_template("home.html")
 
 @app.route("/get_covid_status", methods=["POST"])
+@login_required
 def get_covid_status():
 	# if request.method == "POST":
 	t = request.json
 	cityName = t["cityName"]
 	statusDict = home_page_queries.get_covid_status(cityName)
+	if statusDict == None:
+		return ('', 204)
 	return statusDict
 
 @app.route("/city_name_suggestions", methods=["POST"])
+@login_required
 def city_name_suggestions():
 	# if request.method == "POST":
 	t = request.json
@@ -431,6 +445,7 @@ def booking_details(booking_id):
 	return render_template('booking_details.html', entries=entries, dep_date=dep_date)
 
 @app.route('/hotel/<hotel_id>', methods=['GET','POST'])
+@login_required
 def hotel_page(hotel_id):
 	hotel = prof.get_hotel(hotel_id)
 	if not hotel:
@@ -492,9 +507,9 @@ def book_trip():
 	return redirect(url_for('profile'))
 
 
-@app.route("/<name>")
-def user(name):
-	return f"Hello! This is <b>{name}</b>."
+# @app.route("/<name>")
+# def user(name):
+# 	return f"Hello! This is <b>{name}</b>."
 
 @app.route("/admin")
 def admin():

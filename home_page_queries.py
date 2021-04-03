@@ -3,6 +3,9 @@ import datetime
 
 # get all cities with start with characters 'start'
 def get_all_cities(start_string_of_city):
+    """
+    This is used for auto complete drop down in home page. All the city names that start with start_string_of_city will be returned.
+    """
     query = """select DISTINCT(city) 
     from airport_codes 
     where city like %s 
@@ -19,10 +22,10 @@ def get_covid_status(city):
     and ac.state_code = cs.state_code;"""
     queryReult = db.fetch(query, (city, ))
     if (len(queryReult) == 0):
-        statusDict = {"inDB": False}
-        return statusDict
+        return None
     status = queryReult[0]
-    statusDict = {"inDB": True, "stateCode": status[0], "deaths": status[1], "hospitalized": status[2], "inICU": status[3], "onVentilator": status[4], "positive": status[5], "recovered": status[6]}
+    # statusDict = {"stateCode": status[0], "deaths": status[1], "hospitalized": status[2], "inICU": status[3], "onVentilator": status[4], "positive": status[5], "recovered": status[6]}
+    statusDict = {"Deaths": status[1], "Hospitalized": status[2], "Positive Cases": status[5], "Recovered": status[6]}
     return statusDict
 
 def get_direct_connection(city1,city2,dep_date):
@@ -63,7 +66,7 @@ def get_connecting_flights(city1,city2,dep_date):
     and (rc.t = ac2.airport_code and ac2.city = %s)
     group by rc.flight_ids , rc.cost
     order by cost asc
-    limit 3;"""
+    limit 5;"""
     conn = db.fetch(query , (city1 , dep_date , city1 , city2 , dep_date , city1 , city2 , ))
 
     temp_conn = []
@@ -79,7 +82,7 @@ def get_best_hotel(city):
     and hotels.city = %s
     group by hotels.hotel_id , hotels_rating.rating
     order by rating desc
-    limit 3; """
+    limit 10; """
 
     hotels = db.fetch(query, (city, ))
 

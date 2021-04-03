@@ -29,3 +29,21 @@ def update_password(userid, password):
 
 def delete_user(userid):
     db.commit("delete from users where userid=%s", (userid, ))
+
+def get_all_diabled_cities():
+    cities = db.fetch("select * from disabled_cities;")
+    return cities
+
+def disable_city(city):
+    """disable a city if not already disabled"""
+    query = """
+    INSERT INTO disabled_cities (city)
+    SELECT * FROM (SELECT %s) AS tmp
+    WHERE NOT EXISTS (
+        SELECT city FROM disabled_cities WHERE city = %s
+    ) LIMIT 1;
+    """
+    db.commit(query, (city, city, ))
+
+def enable_city(city):
+    db.commit("delete from disabled_cities where city=%s;", (city, ))

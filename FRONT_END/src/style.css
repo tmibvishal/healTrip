@@ -1,3 +1,15 @@
+.massive{
+    color:#960DFF;
+    font-weight:900;
+    font-size:6em;
+    line-height:0.8em;
+    font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+}
+
+.alternate_massive{
+    color:black;
+}
+
 .customContainer {
     padding: 10px !important;
 }

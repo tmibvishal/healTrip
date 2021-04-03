@@ -8,10 +8,17 @@ create table users(
     constraint unique_username UNIQUE (uname)
 );
 
+-- TODO VishalS: add triggers and make starting 5 table er diagram
+create table disabled_cities(
+    city text NOT NULL,
+    constraint unique_city UNIQUE (city)
+);
+
 create table airport_codes(
     city text ,
     state_code text ,
     airport_code text,
+    enabled boolean default true,
     constraint airport_key primary key (airport_code)
 );
 
@@ -35,6 +42,7 @@ create table booking_entry(
     constraint booking_ref foreign key (booking_id) references bookings(id) on delete cascade
 );
 
+-- TODO Chirag: only include airport that are enabled - these 2 tables ka ER diagram bna
 create table flights(
     flight_id integer,
     fl_date date ,
@@ -56,6 +64,7 @@ create table hotels(
     name text,
     address text,
     postalcode text,
+    enabled boolean default true,
     constraint hotel_key primary key (hotel_id)
 );
 
@@ -89,12 +98,41 @@ create table covid_status(
     constraint state_ref foreign key (state_code) references states(state_code)
 );
 
-\copy airport_codes from 'data/codes.csv' delimiter ',' csv header;
+\copy airport_codes (city, state_code, airport_code) from 'data/codes.csv' delimiter ',' csv header;
 \copy flights from 'data/new_flights.csv' delimiter ',' csv header;
-\copy hotels from 'data/hotels.csv' delimiter ',' csv header;
+\copy hotels (hotel_id, city, state_code, name, address, postalcode) from 'data/hotels.csv' delimiter ',' csv header;
 \copy reviews from 'data/reviews.csv' delimiter ',' csv header;
 \copy states from 'data/states.csv' delimiter ',' csv header;
 \copy covid_status from 'data/covid_status.csv' delimiter ',' csv header;
+
+CREATE OR REPLACE FUNCTION procedure_disable_city() RETURNS TRIGGER AS $p_disable_city$
+    BEGIN
+        IF (TG_OP = 'DELETE') THEN
+            UPDATE airport_codes SET enabled = true WHERE city = OLD.city;
+            UPDATE hotels SET enabled = true WHERE city = OLD.city;
+            RETURN OLD;
+        ELSIF (TG_OP = 'UPDATE') THEN
+            -- can also check if new updated value is not already in table o.w. error
+            UPDATE airport_codes SET enabled = true WHERE city = OLD.city;
+            UPDATE hotels SET enabled = true WHERE city = OLD.city;
+            UPDATE airport_codes SET enabled = false WHERE city = NEW.city;
+            UPDATE hotels SET enabled = false WHERE city = NEW.city;
+            RETURN NEW;
+        ELSIF (TG_OP = 'INSERT') THEN
+            UPDATE airport_codes SET enabled = false WHERE city = NEW.city;
+            UPDATE hotels SET enabled = false WHERE city = NEW.city;
+            RETURN NEW;
+        END IF;
+        RETURN NULL; -- result is ignored since this is an AFTER trigger
+    END;
+$p_disable_city$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER disable_city_trigger
+    AFTER INSERT OR UPDATE OR DELETE 
+    ON disabled_cities
+    FOR EACH ROW 
+    EXECUTE PROCEDURE procedure_disable_city();
+
 
 create index city_index on airport_codes(city); -- So that auto complete feature will work faster on home page --
 
@@ -119,3 +157,6 @@ as
 
 create index rating_index on hotels_rating(hotel_id);
 
+
+
+-- TODO Bindal: make last 3 ER table diagram --
