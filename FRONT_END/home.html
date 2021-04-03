@@ -187,10 +187,12 @@
                 success: function (covidStatus) {
                   let card = input_text_box.parentNode.children[1];
                   if (card != null) {
-                    if (covidStatus["inDB"]) {
+                    if (covidStatus != undefined) {
                       formattedStatus = ""
                       for (let [key, value] of Object.entries(covidStatus)) {
-                        formattedStatus += `<strong>${key}:</strong> ${value}<br>`
+                        if (value != null) {
+                          formattedStatus += `<strong>${key}:</strong> ${value}<br>`
+                        }
                       }
                       card.children[1].firstElementChild.children[1]
                         .innerHTML = formattedStatus;

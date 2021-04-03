@@ -312,6 +312,8 @@ def get_covid_status():
 	t = request.json
 	cityName = t["cityName"]
 	statusDict = home_page_queries.get_covid_status(cityName)
+	if statusDict == None:
+		return ('', 204)
 	return statusDict
 
 @app.route("/city_name_suggestions", methods=["POST"])

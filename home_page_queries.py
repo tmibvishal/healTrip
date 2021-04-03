@@ -22,10 +22,10 @@ def get_covid_status(city):
     and ac.state_code = cs.state_code;"""
     queryReult = db.fetch(query, (city, ))
     if (len(queryReult) == 0):
-        statusDict = {"inDB": False}
-        return statusDict
+        return None
     status = queryReult[0]
-    statusDict = {"inDB": True, "stateCode": status[0], "deaths": status[1], "hospitalized": status[2], "inICU": status[3], "onVentilator": status[4], "positive": status[5], "recovered": status[6]}
+    # statusDict = {"stateCode": status[0], "deaths": status[1], "hospitalized": status[2], "inICU": status[3], "onVentilator": status[4], "positive": status[5], "recovered": status[6]}
+    statusDict = {"Deaths": status[1], "Hospitalized": status[2], "Positive Cases": status[5], "Recovered": status[6]}
     return statusDict
 
 def get_direct_connection(city1,city2,dep_date):
