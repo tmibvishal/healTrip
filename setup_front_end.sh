@@ -1,2 +1,3 @@
-echo "setting up front end"
-pip install -r requirements.txt
+pip3 install Flask
+pip3 install Flask-Login
+pip3 install psycopg2-binary

@@ -170,11 +170,7 @@
   </div>
 </div>
 <script>
-  let travelObj = {
-    {
-      travelObj | tojson
-    }
-  };
+  let travelObj = {{travelObj | tojson}};
 
   for (let i = 1; i <= travelObj.selections.length; ++i) {
     document.getElementById('entry-' + i.toString()).onclick = () => {

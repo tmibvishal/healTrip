@@ -9,6 +9,7 @@ def connect():
     'port': 5432
     }
     c = psycopg2.connect(**params)
+    # c = psycopg2.connect("dbname=db_group_22")
     return c
 
 def commit(query, params):
