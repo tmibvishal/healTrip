@@ -21,6 +21,7 @@ initialise_autocomplete = False
 class User:
 	def __init__(self, user):
 		self.id = user[0]
+		self.is_admin = user[4]
 
 	def is_authenticated(self):
 		return True
@@ -331,6 +332,24 @@ def city_name_suggestions():
 	cities = home_page_queries.get_all_cities(start_string_of_city)
 	return {"arr": cities}
 
+@app.route("/city_name_suggestions_enabled", methods=["POST"])
+@login_required
+def city_name_suggestions_enabled():
+	# if request.method == "POST":
+	t = request.json
+	start_string_of_city = t["input_val"]
+	cities = home_page_queries.get_enabled_cities(start_string_of_city)
+	return {"arr": cities}
+
+@app.route("/city_name_suggestions_disabled", methods=["POST"])
+@login_required
+def city_name_suggestions_disabled():
+	# if request.method == "POST":
+	t = request.json
+	start_string_of_city = t["input_val"]
+	cities = home_page_queries.get_disabled_cities(start_string_of_city)
+	return {"arr": cities}
+
 @app.route("/profile")
 @login_required
 def profile():
@@ -506,22 +525,32 @@ def book_trip():
 
 	return redirect(url_for('profile'))
 
-
-# @app.route("/<name>")
-# def user(name):
-# 	return f"Hello! This is <b>{name}</b>."
-
 @app.route("/admin")
 def admin():
-	return redirect(url_for("user", name="Vishal Singh (Admin)"))
+	if not current_user.is_admin:
+		return render_template('invalid_access.html')
+	return render_template('admin.html')
 
-# example of database
-@app.route('/toys', methods=["GET", "POST"])
-def toys():
-    if request.method == "POST":
-        db.add_toy(request.form['name'])
-        return redirect(url_for('index'))
-    return render_template('dbexample.html', toys=db.get_all_toys())
+@app.route('/disable_city', methods=['POST'])
+@login_required
+def disable_city():
+	if not current_user.is_admin:
+		return render_template('invalid_access.html')
+	city_name = request.form.get('city')
+	print(city_name)
+	auth.disable_city(city_name)
+	flash('All hotels in and flights to/from ' + city_name + ' are disabled')
+	return redirect(url_for('admin'))
+
+@app.route('/enable_city', methods=['POST'])
+@login_required
+def enable_city():
+	if not current_user.is_admin:
+		return render_template('invalid_access.html')
+	city_name = request.form.get('city')
+	auth.enable_city(city_name)
+	flash('All hotels in and flights to/from ' + city_name + ' are enabled')
+	return redirect(url_for('admin'))
 
 if __name__ == "__main__":
 	# if not first time then remove this

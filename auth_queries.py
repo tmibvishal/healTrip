@@ -1,7 +1,10 @@
 import db
 
 def new_user(username, email, password):
-    db.commit("insert into users(uname,email,pass) values(%s, %s, %s)", (username, email, password))
+    if(username=='admin'):
+        db.commit("insert into users(uname,email,pass,is_admin) values(%s, %s, %s, %s)", (username, email, password, True))
+    else:
+        db.commit("insert into users(uname,email,pass,is_admin) values(%s, %s, %s, %s)", (username, email, password, False))
 
 def get_user_from_email(email):
     users = db.fetch("select * from users where email=%s", (email, ))

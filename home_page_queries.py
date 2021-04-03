@@ -15,6 +15,32 @@ def get_all_cities(start_string_of_city):
     cities = db.fetch(query, (like_pattern, ))
     return cities
 
+def get_enabled_cities(start_string_of_city):
+    """
+    This is used for auto complete drop down in admin page. All the city names that start with start_string_of_city will be returned.
+    """
+    query = """select city
+    from (select distinct(city) from airport_codes where city not in (select * from disabled_cities)) cities
+    where city like %s 
+    LIMIT 10;"""
+    search_term = start_string_of_city
+    like_pattern = '{}%'.format(start_string_of_city)
+    cities = db.fetch(query, (like_pattern, ))
+    return cities
+
+def get_disabled_cities(start_string_of_city):
+    """
+    This is used for auto complete drop down in admin page. All the city names that start with start_string_of_city will be returned.
+    """
+    query = """select city
+    from disabled_cities
+    where city like %s 
+    LIMIT 10;"""
+    search_term = start_string_of_city
+    like_pattern = '{}%'.format(start_string_of_city)
+    cities = db.fetch(query, (like_pattern, ))
+    return cities
+
 def get_covid_status(city):
     query = """select cs.state_code , cs.deaths , cs.hospitalized , cs.inICU , cs.onVentilator , cs.positive , cs.recovered
     from covid_status as cs , airport_codes as ac

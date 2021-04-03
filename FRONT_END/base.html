@@ -26,11 +26,13 @@
             <a href="/register" class="btn btn-link">Register</a>
             {% endif %}
             {% if current_user.is_authenticated %}
+            {% if current_user.is_admin %}
+            <a href='/admin' class='btn btn-link'>Admin</a>
+            {% endif %}
             <a href='/home' class='btn btn-link'>Home</a>
             <a href="/profile" class="btn btn-link">Profile</a>
             <a href="/logout" class="btn btn-link">Logout</a>
             {% endif %}
-            <a href="..." class="btn btn-link">Contact</a>
             <a href="https://github.com/tmibvishal/Heal-trip" class="btn btn-link"><i class="fab fa-github"></i> GitHub</a>
         </section>
     </header>
