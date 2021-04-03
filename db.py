@@ -1,7 +1,14 @@
 import psycopg2
 
 def connect():
-    c = psycopg2.connect("dbname=db_group_22")
+    params = {
+    'database': 'group_22',
+    'user': 'group_22',
+    'password': 'NKyjO7dPvQufB',
+    'host': '10.17.50.232',
+    'port': 5432
+    }
+    c = psycopg2.connect(**params)
     return c
 
 def commit(query, params):

@@ -15,3 +15,4 @@ drop table bookings cascade;
 drop table booking_entry cascade;
 drop table users cascade;
 drop table covid_status cascade;
+drop table disabled_cities cascade;
