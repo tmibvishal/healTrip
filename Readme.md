@@ -21,7 +21,7 @@ dropdb group_22
 
 To create DATA_DUMP, do the following
 ```
-pg_dump group_22 > data_dump.sql
+pg_dump group_22 > DATA_DUMP/data_dump.sql
 ```
 Also replace all occurences of user (e.g. 'vishal') with 'group_22' in the data_dump.sql file.
 
