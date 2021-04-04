@@ -442,6 +442,7 @@ def booking_details(booking_id):
 			hotel = prof.get_hotel(booking_entry[3])
 			entries.append({
 				'is_hotel':True,
+				'hotel_id':hotel[0],
 				'hotel_name':hotel[3],
 				'hotel_city':hotel[1],
 				'stay_period':booking_entry[4]
@@ -490,7 +491,10 @@ def hotel_page(hotel_id):
 		travelObj = json.loads(t)
 		return render_template('hotel.html', preview=True, travelObj=travelObj, hotel=hotel, reviews=reviews, avg_rating=avg_rating, hotel_state=hotel_state)
 
-	return render_template('hotel.html', preview=False, hotel=hotel, reviews=reviews, avg_rating=avg_rating, hotel_state=hotel_state)
+	user_has_booked = prof.user_has_booked(hotel_id, current_user.id)
+	user_has_reviewed = prof.user_has_reviewed(hotel_id, current_user.id)
+	user_has_booked = user_has_booked and not user_has_reviewed
+	return render_template('hotel.html', preview=False, user_has_booked=user_has_booked, hotel=hotel, reviews=reviews, avg_rating=avg_rating, hotel_state=hotel_state)
 
 @app.route('/book_trip', methods=['POST'])
 @login_required
@@ -551,6 +555,20 @@ def enable_city():
 	auth.enable_city(city_name)
 	flash('All hotels in and flights to/from ' + city_name + ' are enabled')
 	return redirect(url_for('admin'))
+
+@app.route('/add_review/<hotel_id>', methods=['POST'])
+@login_required
+def add_review(hotel_id):
+	title = request.form.get('review_title')
+	details = request.form.get('review_details')
+	rating = request.form.get('star')
+	if len(title)==0 or len(details)==0 or rating is None:
+		flash('Please fill all the fields')
+		return redirect(url_for('hotel_page', hotel_id=hotel_id))
+	user = auth.get_user_from_userid(current_user.id)
+	today = date.today()
+	prof.add_review(hotel_id, today, rating, user[1], title, details)
+	return redirect(url_for('hotel_page', hotel_id=hotel_id))
 
 if __name__ == "__main__":
 	# if not first time then remove this

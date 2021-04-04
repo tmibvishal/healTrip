@@ -43,3 +43,26 @@ def get_state(state_code):
         print(state_code, 'not found')
         return None
     return states[0][0]
+
+def user_has_booked(hotel_id, user_id):
+    query="""
+    select * from bookings b, booking_entry be where 
+    b.id=be.booking_id and userid=%s and is_hotel='true' and entry_id=%s
+    """
+    entries = db.fetch(query, (user_id, hotel_id))
+    return len(entries)>0
+
+def user_has_reviewed(hotel_id, user_id):
+    query="""
+    select * from users, reviews where users.uname=reviews.review_username and userid=%s and hotel_id=%s
+    """
+    entries = db.fetch(query, (user_id, hotel_id))
+    return len(entries)>0
+
+def add_review(hotel_id, cur_date, rating, user_id, title, details):
+    query="""
+    insert into reviews(hotel_id, review_date, review_rating, review_username, review_title, review_text)
+    values (%s, %s, %s, %s, %s, %s)
+    """
+    db.commit(query, (hotel_id, cur_date, rating, user_id, title, details))
+

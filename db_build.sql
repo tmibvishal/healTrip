@@ -69,7 +69,7 @@ create table hotels(
 );
 
 create table reviews(
-    review_id integer,
+    review_id serial,
     hotel_id integer,
     review_date date,
     review_rating real,
@@ -101,7 +101,7 @@ create table covid_status(
 \copy airport_codes (city, state_code, airport_code) from 'data/codes.csv' delimiter ',' csv header;
 \copy flights from 'data/new_flights.csv' delimiter ',' csv header;
 \copy hotels (hotel_id, city, state_code, name, address, postalcode) from 'data/hotels.csv' delimiter ',' csv header;
-\copy reviews from 'data/reviews.csv' delimiter ',' csv header;
+\copy reviews(hotel_id,review_date,review_rating,review_username,review_title,review_text) from 'data/reviews.csv' delimiter ',' csv header;
 \copy states from 'data/states.csv' delimiter ',' csv header;
 \copy covid_status from 'data/covid_status.csv' delimiter ',' csv header;
 
